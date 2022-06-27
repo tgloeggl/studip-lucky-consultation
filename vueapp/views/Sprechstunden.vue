@@ -17,9 +17,7 @@ export default {
     },
 
     methods: {
-        uploadVideo() {
-            this.uploadDialog = true;
-        }
+
     },
 
     mounted() {
