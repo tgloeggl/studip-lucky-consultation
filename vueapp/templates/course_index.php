@@ -12,6 +12,10 @@
 
 <!-- load bundles -->
 <% for(var i = 0; i < htmlWebpackPlugin.tags.headTags.length; i++) { %>
-<? PageLayout::addScript($this->plugin->getPluginUrl() . '/static<%= htmlWebpackPlugin.tags.headTags[i].attributes.src %>'); ?>
+    <% if (htmlWebpackPlugin.tags.headTags[i].attributes.rel) { %>
+        <? PageLayout::addStylesheet($this->plugin->getPluginUrl() . '/static<%= htmlWebpackPlugin.tags.headTags[i].attributes.href %>'); ?>
+    <% } else { %>
+        <? PageLayout::addScript($this->plugin->getPluginUrl() . '/static<%= htmlWebpackPlugin.tags.headTags[i].attributes.src %>'); ?>
+    <% } %>
 <% } %>
 <!-- END load bundles -->

@@ -9,7 +9,7 @@ const MiniCssExtractPlugin      = require("mini-css-extract-plugin");
 module.exports = (env) => {
     return {
         entry: [
-            './vueapp/app.js'
+            './vueapp/app.js', './assets/luckyconsultation.scss'
             ], // the entry point
         output: {
             filename: '[name].[contenthash].js', // the output filename
@@ -80,8 +80,8 @@ module.exports = (env) => {
                 filename: '../app/views/course/index.php'
             }),
             new MiniCssExtractPlugin({
-                filename: "static/[name].css",
-                chunkFilename: "static/[name].css?h=[chunkhash]"
+                filename: "[name].css",
+                chunkFilename: "[name].css?h=[chunkhash]"
             }),
         ],
         resolve: {
