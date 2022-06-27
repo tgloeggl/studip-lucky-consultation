@@ -10,13 +10,21 @@ use LuckyConsultation\LuckyConsultationTrait;
 use LuckyConsultation\LuckyConsultationController;
 use LuckyConsultation\Models\Pools;
 
-class PoolsList extends LuckyConsultationController
+class PoolsDelete extends LuckyConsultationController
 {
     use LuckyConsultationTrait;
 
     public function __invoke(Request $request, Response $response, $args)
     {
         global $user;
+
+        $pool = Pools::find($args['pool_id']);
+
+        if ($pool->course_id == $args['course_id']) {
+            $pool->delete();
+        } else {
+            throw new Error('Access Denied', 403);
+        }
 
         $pools = Pools::findByCourse_id($args['course_id']);
 

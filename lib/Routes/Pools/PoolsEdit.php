@@ -10,13 +10,27 @@ use LuckyConsultation\LuckyConsultationTrait;
 use LuckyConsultation\LuckyConsultationController;
 use LuckyConsultation\Models\Pools;
 
-class PoolsList extends LuckyConsultationController
+class PoolsEdit extends LuckyConsultationController
 {
     use LuckyConsultationTrait;
 
     public function __invoke(Request $request, Response $response, $args)
     {
         global $user;
+
+        $json = $this->getRequestData($request);
+
+        $pool = Pools::find($json['id']);
+        
+        if ($pool->course_id == $args['course_id']) {
+            $pool->setData([
+                'name' => $json['name'],
+                'date' => $json['date']
+            ]);
+            $pool->store();
+        } else {
+            throw new Error('Access Denied', 403);
+        }
 
         $pools = Pools::findByCourse_id($args['course_id']);
 

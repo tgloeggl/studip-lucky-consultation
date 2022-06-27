@@ -6,19 +6,20 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use LuckyConsultation\Errors\Error;
 
-class AdminPerms
+class CheckCourse
 {
     // the container
-    private $container;
+    private $perms;
+
 
     /**
      * Der Konstruktor.
      *
      * @param callable $container the global slim container
      */
-    public function __construct($container)
+    public function __construct($perms)
     {
-        $this->container = $container;
+        $this->perms     = $perms;
     }
 
     /**
@@ -36,9 +37,10 @@ class AdminPerms
      */
     public function __invoke(Request $request, Response $response, $next)
     {
-        $container = $this->container;
+        $route = $request->getAttribute('route');
+        $course_id = $route->getArgument('course_id');
 
-        if (!$GLOBALS['perm']->have_studip_perm('root')) {
+        if (!$course_id || !$GLOBALS['perm']->have_studip_perm($this->perms, $course_id)) {
             throw new Error('Access Denied', 403);
         }
 

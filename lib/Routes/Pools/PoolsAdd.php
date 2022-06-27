@@ -22,9 +22,10 @@ class PoolsAdd extends LuckyConsultationController
 
         $pool = new Pools;
         $pool->setData($json);
+        $pool->course_id = $args['course_id'];
         $pool->store();
 
-        $pools = Pools::findBySql(1);
+        $pools = Pools::findByCourse_id($args['course_id']);
 
         return $this->createResponse($this->toArray($pools), $response);
     }

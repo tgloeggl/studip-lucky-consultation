@@ -2,7 +2,7 @@
     <div>
         <div>
             <h1>Lospools</h1>
-            <studip-button icon="add" @click="addPool = true">
+            <studip-button icon="add" @click="cancelPoolEdit();addPool = true ">
                 Neuer Lospool
             </studip-button>
 
@@ -21,18 +21,58 @@
                 <tbody>
                     <tr v-for="pool in pools" :key="pool.id">
                         <td>
-                            {{ pool.attributes.name }}
+                            <span v-if="currentPool.id == pool.id">
+                                <input :class="{ 
+                                        invalid: !validation.name
+                                    }" 
+                                    type="text" 
+                                    placeholder="PP, KJP, ..." 
+                                    v-model="currentPool.name"
+                                >
+                            </span>
+    
+                            <span v-else>
+                                {{ pool.attributes.name }}
+                            </span>
                         </td>
                         <td>
-                            {{ pool.attributes.date }} 
-                            {{ pool.attributes.date | datetime }}
+                            <span v-if="currentPool.id == pool.id">
+                                <input :class="{ 
+                                        invalid: !validation.date
+                                    }"
+                                    type="datetime-local" 
+                                    v-model="currentPool.date"
+                                >
+                            </span>
+    
+                            <span v-else>
+                                {{ pool.attributes.date | datetime }}
+                            </span>
                         </td>
-                        <td>
+                        <td class="actions">
+                            <span v-if="currentPool.id == pool.id">
+                                <studip-button icon="accept" @click="storePool">
+                                    Speichern
+                                </studip-button>
 
+                                <studip-button icon="cancel" @click="cancelPoolEdit">
+                                    Abbrechen
+                                </studip-button>
+                            </span>
+    
+                            <span v-else>
+                                <a href="#" @click.prevent="editPool(pool)">
+                                    <studip-icon shape="edit"/> Bearbeiten
+                                </a>
+
+                                <a href="#" @click.prevent="deletePool(pool)">
+                                    <studip-icon shape="trash"/> Löschen
+                                </a>
+                            </span>
                         </td>
                     </tr>
 
-                    <tr v-if="addPool">
+                    <tr v-if="addPool && !currentPool.id">
                         <td>
                             <input :class="{ 
                                     invalid: !validation.name
@@ -50,9 +90,13 @@
                                 v-model="currentPool.date"
                             >
                         </td>
-                        <td>
-                            <studip-button icon="accept" @click="storeNewPool">
+                        <td class="actions">
+                            <studip-button icon="accept" @click="storePool">
                                 Speichern
+                            </studip-button>
+
+                            <studip-button icon="cancel" @click="cancelPoolEdit">
+                                Abbrechen
                             </studip-button>
                         </td>
                     </tr>
@@ -73,12 +117,13 @@
 import { mapGetters } from "vuex";
 
 import StudipButton from '@/components/Studip/StudipButton';
+import StudipIcon from '@/components/Studip/StudipIcon';
 
 export default {
     name: "Sprechstunden",
 
     components: {
-        StudipButton
+        StudipButton,   StudipIcon
     },
 
     data() {
@@ -100,7 +145,7 @@ export default {
     },
 
     methods: {
-        storeNewPool() {
+        storePool() {
             this.validation = {
                 name: true,
                 date: true
@@ -122,7 +167,39 @@ export default {
                 return;
             }
 
-            this.$store.dispatch('addPool', this.currentPool);
+            let promise;
+            if (this.currentPool.id) {
+                promise = this.$store.dispatch('editPool', this.currentPool);
+            } else {
+                promise = this.$store.dispatch('addPool', this.currentPool);
+            }
+
+            promise.then(() => {
+                this.cancelPoolEdit();
+            })
+        },
+
+        deletePool(pool) {
+            if (confirm('Sind sie sicher, dass sie den Pool "' + pool.attributes.name + '" löschen möchten?')) {
+                this.$store.dispatch('deletePool', pool.id);
+            }
+        },
+
+        editPool(pool) {
+            this.currentPool = {
+                id  : pool.id, 
+                name: pool.attributes.name,
+                date: pool.attributes.date,
+            }
+        },
+
+        cancelPoolEdit() {
+            this.currentPool = {
+                name: '',
+                date: null
+            }
+
+            this.addPool = false;
         }
     },
 

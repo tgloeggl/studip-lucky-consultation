@@ -47,6 +47,20 @@ const actions = {
             });
     },
 
+    async editPool({ dispatch, commit, state }, pool) {
+        return ApiService.put('course/' + state.cid + '/pools', pool)
+            .then(({ data }) => {
+                commit('setPools', data.data);
+            });
+    },
+
+    async deletePool({ dispatch, commit, state }, id) {
+        return ApiService.delete('course/' + state.cid + '/pools/' + id)
+            .then(({ data }) => {
+                commit('setPools', data.data);
+            });
+    },
+
     async loadPools({ dispatch, commit, state }, pool) {
         return ApiService.get('course/' + state.cid + '/pools', pool)
             .then(({ data }) => {
