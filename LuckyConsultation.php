@@ -94,7 +94,7 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
 
         $navigation = new Navigation(
             'luckyconsultation',
-            PluginEngine::getURL($this, [], 'course/index/false')
+            PluginEngine::getURL($this, [], 'course/index')
         );
         $navigation->setBadgeNumber(0);
         $navigation->setDescription("Losbasierte Sprechstundenvergabe");
@@ -136,9 +136,14 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
         }
         */
 
+
         $main    = new Navigation($title);
 
-        $main->setURL(PluginEngine::getURL($this, [], 'course/index'));
+        if ($GLOBALS['perm']->have_studip_perm('tutor', $course_id)) {
+            $main->setURL(PluginEngine::getURL($this, [], 'course/index/#/editor'));
+        } else {
+            $main->setURL(PluginEngine::getURL($this, [], 'course/index'));
+        }
 
         $index = new Navigation($this->_('Sprechstunden'));
         $index->setURL(PluginEngine::getURL($this, [], 'course/index'));

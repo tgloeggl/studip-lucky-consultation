@@ -9,6 +9,12 @@ export default new Router({
             path: "/",
             name: "index",
             component: () => import("@/views/Sprechstunden")
+        },
+
+        {
+            path: "/editor",
+            name: "index",
+            component: () => import("@/views/SprechstundenEditor")
         }
     ]
 });

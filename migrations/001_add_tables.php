@@ -2,7 +2,7 @@
 
 class AddTables extends Migration
 {
-    function description() 
+    function description()
     {
         return 'Add tables for LuckyConsultation plugin';
     }
@@ -34,10 +34,11 @@ class AddTables extends Migration
         )");
 
         $db->exec("CREATE TABLE `luckyconsultation_waitinglist` (
-            `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `dates_id` int NOT NULL,
             `user_id` varchar(32) NOT NULL,
-            UNIQUE `dates_id_user_id` (`dates_id`, `user_id`),
+            `mkdate` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+            `chdate` datetime NOT NULL,
+            PRIMARY KEY `dates_id_user_id` (`dates_id`, `user_id`),
             FOREIGN KEY (`dates_id`) REFERENCES `luckyconsultation_dates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
         )");
 

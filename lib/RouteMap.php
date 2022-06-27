@@ -36,23 +36,26 @@ class RouteMap
     public function authenticatedRoutes()
     {
         $this->app->get('/user', Routes\Users\UsersShow::class);
-
-        ##TEMPLATE##
     }
 
     public function courseRoutes()
     {
+        $this->app->get('/course/{course_id}/waitinglist', Routes\Dates\WaitingList::class);
+        $this->app->put('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListAdd::class);
+        $this->app->delete('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListDelete::class);
 
+        $this->app->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
+        $this->app->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
+        $this->app->get('/course/{course_id}/mydates', Routes\Dates\MyDatesList::class);
     }
 
     public function privilegedRoutes()
     {
-        $this->app->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
         $this->app->post('/course/{course_id}/pools', Routes\Pools\PoolsAdd::class);
         $this->app->put('/course/{course_id}/pools', Routes\Pools\PoolsEdit::class);
         $this->app->delete('/course/{course_id}/pools/{pool_id}', Routes\Pools\PoolsDelete::class);
 
-        $this->app->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
+
         $this->app->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
         $this->app->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
         $this->app->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);

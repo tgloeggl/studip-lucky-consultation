@@ -1,7 +1,7 @@
 <?php
 
 namespace LuckyConsultation\Models;
-class Dates extends UPMap 
+class Dates extends UPMap
 {
     public static function configure($config = [])
     {
@@ -9,7 +9,7 @@ class Dates extends UPMap
 
         $config['belongs_to']['user'] = [
             'class_name' => 'User',
-            'foreign_key' => 'user_id',
+            'foreign_key' => 'user_id'
         ];
 
         $config['has_many']['waitinglist'] = [
@@ -18,7 +18,7 @@ class Dates extends UPMap
             'assoc_foreign_key' => 'dates_id'
         ];
 
-        $config['additional_fields']['username'] = ['user', 'getFullname'];
+        //$config['additional_fields']['username'] = ['user', 'getFullName'];
         $config['additional_fields']['waiting']['get']  = 'countWaitingList';
 
         parent::configure($config);

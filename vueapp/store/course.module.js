@@ -5,6 +5,8 @@ const state = {
    cid: null,
    pools: null,
    dates: null,
+   mydates: null,
+   waitinglist: null,
    currentUser: {}
 }
 
@@ -19,6 +21,14 @@ const getters = {
 
     dates(state) {
         return state.dates;
+    },
+
+    mydates(state) {
+        return state.mydates;
+    },
+
+    waitinglist(state) {
+        return state.waitinglist;
     },
 
     currentUser(state) {
@@ -37,6 +47,27 @@ const actions = {
         return ApiService.get('user')
             .then(({ data }) => {
                 commit('setCurrentUser', data.data);
+            });
+    },
+
+    async loadWaitingList({ commit, dispatch}) {
+        return ApiService.get('course/' + state.cid + '/waitinglist')
+            .then(({ data }) => {
+                commit('setWaitingList', data.data);
+            });
+    },
+
+    async addToWaitingList({ commit, dispatch}, id) {
+        return ApiService.put('course/' + state.cid + '/waitinglist/' + id)
+            .then(({ data }) => {
+                commit('setWaitingList', data.data);
+            });
+    },
+
+    async removeFromWaitingList({ commit, dispatch}, id) {
+        return ApiService.delete('course/' + state.cid + '/waitinglist/' + id)
+            .then(({ data }) => {
+                commit('setWaitingList', data.data);
             });
     },
 
@@ -94,6 +125,13 @@ const actions = {
             .then(({ data }) => {
                 commit('setDates', data.data);
             });
+    },
+
+    async loadMyDates({ dispatch, commit, state }) {
+        return ApiService.get('course/' + state.cid + '/mydates')
+            .then(({ data }) => {
+                commit('setMyDates', data.data);
+            });
     }
 }
 
@@ -112,6 +150,14 @@ const mutations = {
 
     setDates(state, dates) {
         state.dates = dates;
+    },
+
+    setMyDates(state, mydates) {
+        state.mydates = mydates;
+    },
+
+    setWaitingList(state, waitinglist) {
+        state.waitinglist = waitinglist;
     }
 }
 
