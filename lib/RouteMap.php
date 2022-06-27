@@ -51,5 +51,10 @@ class RouteMap
         $this->app->post('/course/{course_id}/pools', Routes\Pools\PoolsAdd::class);
         $this->app->put('/course/{course_id}/pools', Routes\Pools\PoolsEdit::class);
         $this->app->delete('/course/{course_id}/pools/{pool_id}', Routes\Pools\PoolsDelete::class);
+
+        $this->app->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
+        $this->app->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
+        $this->app->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
+        $this->app->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
     }
 }

@@ -2,20 +2,27 @@
     <div>
         <div>
             <h1>Lospools</h1>
-            <studip-button icon="add" @click="cancelPoolEdit();addPool = true ">
+            <studip-button icon="add" @click="cancelPoolEdit();addPool = true">
                 Neuer Lospool
             </studip-button>
 
-            <table class="default" v-if="addPool || pools">
+            <table class="default" v-if="addPool || (pools && pools.length) ">
+                <colgroup>
+                    <col width="40%">
+                    <col width="45%">
+                    <col width="15%">
+                </colgroup>
                 <thead>
                     <tr>
                         <th>
                             Name des Pools
                         </th>
                         <th>
-                            Losen am:
+                            Losen am
                         </th>
-                        <th></th>
+                        <th>
+                            Aktionen
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,7 +30,7 @@
                         <td>
                             <span v-if="currentPool.id == pool.id">
                                 <input :class="{ 
-                                        invalid: !validation.name
+                                        invalid: !poolValidation.name
                                     }" 
                                     type="text" 
                                     placeholder="PP, KJP, ..." 
@@ -38,7 +45,7 @@
                         <td>
                             <span v-if="currentPool.id == pool.id">
                                 <input :class="{ 
-                                        invalid: !validation.date
+                                        invalid: !poolValidation.date
                                     }"
                                     type="datetime-local" 
                                     v-model="currentPool.date"
@@ -75,7 +82,7 @@
                     <tr v-if="addPool && !currentPool.id">
                         <td>
                             <input :class="{ 
-                                    invalid: !validation.name
+                                    invalid: !poolValidation.name
                                 }" 
                                 type="text" 
                                 placeholder="PP, KJP, ..." 
@@ -84,7 +91,7 @@
                         </td>
                         <td>
                             <input :class="{ 
-                                    invalid: !validation.date
+                                    invalid: !poolValidation.date
                                 }"
                                 type="datetime-local" 
                                 v-model="currentPool.date"
@@ -104,11 +111,166 @@
             </table>
         </div>
 
-        <div v-if="pools">
+        <div v-if="pools && pools.length">
             <h1>Vorhandene Termine und Auslastung</h1>
-            <studip-button icon="add">
+            <studip-button icon="add" @click="cancelDateEdit();addDate = true">
                 Neuer Sprechstundentermin
             </studip-button>
+
+             <table class="default" v-if="addDate || (dates && dates.length) ">
+                <colgroup>
+                    <col width="40%">
+                    <col width="30%">
+                    <col width="15%">
+                    <col width="15%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>
+                            Beschreibung
+                        </th>
+                        <th>
+                            Zeitraum
+                        </th>
+                        <th>
+                            Lospool
+                        </th>
+                        <th>
+                            Aktionen
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="date in dates" :key="date.id">
+                        <td>
+                            <span v-if="currentDate.id == date.id">
+                                <input :class="{ 
+                                        invalid: !dateValidation.description
+                                    }" 
+                                    type="text" 
+                                    placeholder="Therapeut/in" 
+                                    v-model="currentDate.description"
+                                >
+                            </span>
+    
+                            <span v-else>
+                                {{ date.attributes.description }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span v-if="currentDate.id == date.id">
+                                <input :class="{ 
+                                        invalid: !dateValidation.start
+                                    }"
+                                    type="datetime-local" 
+                                    v-model="currentDate.start"
+                                >
+                                - 
+                                <input :class="{ 
+                                        invalid: !dateValidation.end
+                                    }"
+                                    type="datetime-local" 
+                                    v-model="currentDate.end"
+                                >
+                            </span>
+    
+                            <span v-else>
+                                {{ date.attributes.start | datetime }} - {{ date.attributes.end| datetime }}
+                            </span>
+                        </td>
+
+                         <td>
+                            <span v-if="currentDate.id == date.id">
+                                <select 
+                                    :class="{ 
+                                        invalid: !dateValidation.pool
+                                    }"
+                                    v-model="currentDate.pool"
+                                >
+                                    <option v-for="pool in pools" :key="pool.id" :value="pool.id">
+                                        {{ pool.attributes.name }}
+                                    </option>
+                                </select>
+                            </span>
+
+                            {{ getPoolName(date.attributes.pool) }}
+                        </td>
+
+                        <td class="actions">
+                            <span v-if="currentDate.id == date.id">
+                                <studip-button icon="accept" @click="storeDate">
+                                    Speichern
+                                </studip-button>
+
+                                <studip-button icon="cancel" @click="cancelDateEdit">
+                                    Abbrechen
+                                </studip-button>
+                            </span>
+    
+                            <span v-else>
+                                <a href="#" @click.prevent="editDate(date)">
+                                    <studip-icon shape="edit"/> Bearbeiten
+                                </a>
+
+                                <a href="#" @click.prevent="deleteDate(date)">
+                                    <studip-icon shape="trash"/> Löschen
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr v-if="addDate && !currentDate.id">
+                        <td>
+                            <input :class="{ 
+                                    invalid: !dateValidation.description
+                                }" 
+                                type="text" 
+                                placeholder="Therapeut/in" 
+                                v-model="currentDate.description"
+                            >
+                        </td>
+                        <td>
+                            <input :class="{ 
+                                    invalid: !dateValidation.start
+                                }"
+                                type="datetime-local" 
+                                v-model="currentDate.start"
+                            >
+                            -
+                            <input :class="{ 
+                                    invalid: !dateValidation.end
+                                }"
+                                type="datetime-local" 
+                                v-model="currentDate.end"
+                            >
+                        </td>
+
+                        <td>
+                            <select 
+                                :class="{ 
+                                    invalid: !dateValidation.pool
+                                }"
+                                v-model="currentDate.pool"
+                            >
+                                <option v-for="pool in pools" :key="pool.id" :value="pool.id">
+                                    {{ pool.attributes.name }}
+                                </option>
+                            </select>
+                        </td>
+
+                        <td class="actions">
+                            <studip-button icon="accept" @click="storeDate">
+                                Speichern
+                            </studip-button>
+
+                            <studip-button icon="cancel" @click="cancelDateEdit">
+                                Abbrechen
+                            </studip-button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </template>
@@ -133,9 +295,23 @@ export default {
                 name: '',
                 date: null
             },
-            validation: {
+            poolValidation: {
                 name: true,
                 date: true
+            },
+
+            addDate: false,
+            currentDate: {
+                description: '',
+                start      : null,
+                end        : null,
+                pool       : null
+            },
+            dateValidation: {
+                description: true,
+                start      : true,
+                end        : true,
+                pool       : true
             }
         }
     },
@@ -146,7 +322,7 @@ export default {
 
     methods: {
         storePool() {
-            this.validation = {
+            this.poolValidation = {
                 name: true,
                 date: true
             }
@@ -154,12 +330,12 @@ export default {
             let validated = true;
             
             if (this.currentPool.name.length == 0) {
-                this.validation.name = false;
+                this.poolValidation.name = false;
                 validated = false;
             }
             
             if (this.currentPool.date == null) {
-                this.validation.date = false;
+                this.poolValidation.date = false;
                 validated = false;
             }
 
@@ -200,12 +376,97 @@ export default {
             }
 
             this.addPool = false;
+        },
+
+        getPoolName(id) {
+            for (let pool_id in this.pools) {
+                if (this.pools[pool_id].id == id) {
+                    return this.pools[pool_id].attributes.name;
+                }
+            }
+
+            return '-';
+        },
+
+        storeDate() {
+            this.dateValidation = {
+                description: true,
+                start      : true,
+                end        : true,
+                pool       : true
+            }
+
+            let validated = true;
+            
+            if (this.currentDate.description.length == 0) {
+                this.dateValidation.description = false;
+                validated = false;
+            }
+            
+            if (this.currentDate.start == null) {
+                this.dateValidation.start = false;
+                validated = false;
+            }
+
+            if (this.currentDate.end == null) {
+                this.dateValidation.end = false;
+                validated = false;
+            }
+
+            if (!this.currentDate.pool) {
+                this.dateValidation.pool = false;
+                validated = false;
+            }
+
+            if (!validated) {
+                return;
+            }
+
+            let promise;
+
+            if (this.currentDate.id) {
+                promise = this.$store.dispatch('editDate', this.currentDate);
+            } else {
+                promise = this.$store.dispatch('addDate', this.currentDate);
+            }
+
+            promise.then(() => {
+                this.cancelDateEdit();
+            })
+        },
+
+        deleteDate(date) {
+            if (confirm('Sind sie sicher, dass sie den Zeiteintrag "' + date.attributes.description + '" löschen möchten?')) {
+                this.$store.dispatch('deleteDate', date.id);
+            }
+        },
+
+        editDate(date) {
+            this.currentDate = {
+                id         : date.id, 
+                description: date.attributes.description,
+                start      : date.attributes.start,
+                end        : date.attributes.end,
+                pool       : date.attributes.pool,
+            }
+        },
+
+        cancelDateEdit() {
+            this.currentDate = {
+                description: '',
+                start      : null,
+                end        : null,
+                pool       : null
+            }
+
+            this.addDate = false;
         }
     },
 
     mounted() {
         this.$store.dispatch('loadCurrentUser');
         this.$store.dispatch('loadPools');
+        this.$store.dispatch('loadDates');
     }
 };
 </script>

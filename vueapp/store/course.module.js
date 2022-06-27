@@ -66,6 +66,34 @@ const actions = {
             .then(({ data }) => {
                 commit('setPools', data.data);
             });
+    },
+
+    async addDate({ dispatch, commit, state }, date) {
+        return ApiService.post('course/' + state.cid + '/dates', date)
+            .then(({ data }) => {
+                commit('setDates', data.data);
+            });
+    },
+
+    async editDate({ dispatch, commit, state }, date) {
+        return ApiService.put('course/' + state.cid + '/dates', date)
+            .then(({ data }) => {
+                commit('setDates', data.data);
+            });
+    },
+
+    async deleteDate({ dispatch, commit, state }, id) {
+        return ApiService.delete('course/' + state.cid + '/dates/' + id)
+            .then(({ data }) => {
+                commit('setDates', data.data);
+            });
+    },
+
+    async loadDates({ dispatch, commit, state }, date) {
+        return ApiService.get('course/' + state.cid + '/dates', date)
+            .then(({ data }) => {
+                commit('setDates', data.data);
+            });
     }
 }
 
@@ -80,6 +108,10 @@ const mutations = {
 
     setPools(state, pools) {
         state.pools = pools;
+    },
+
+    setDates(state, dates) {
+        state.dates = dates;
     }
 }
 
