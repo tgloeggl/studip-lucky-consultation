@@ -1,12 +1,6 @@
 <template>
-    <div class="container" id="app-episodes">
-        <router-view></router-view>
-
-        <!--
-        <MountingPortal mountTo="#sidebar-navigation" name="sidebar-widget">
-            <navigation-widget></navigation-widget>
-        </MountingPortal>
-    -->
+    <div>
+        <h1>Hello World!</h1>
     </div>
 </template>
 
@@ -16,7 +10,7 @@ import { mapGetters } from "vuex";
 import NavigationWidget from '../components/NavigationWidget';
 
 export default {
-    name: "Course",
+    name: "Sprechstunden",
 
     components: {
         NavigationWidget
