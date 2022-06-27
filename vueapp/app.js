@@ -7,6 +7,7 @@ import "./public-path";
 
 import ApiService from "@/common/api.service";
 import DateFilter from "@/common/date.filter";
+import TimeFilter from "@/common/time.filter";
 import DateTimeFilter from "@/common/datetime.filter";
 import ErrorFilter from "@/common/error.filter";
 import FileSizeFilter from "@/common/filesize.filter";
@@ -21,6 +22,7 @@ Vue.config.devtools = true // Need this to use devtool browser extension
 Vue.use(PortalVue)
 
 Vue.filter("date", DateFilter);
+Vue.filter("time", TimeFilter);
 Vue.filter("datetime", DateTimeFilter);
 Vue.filter("error", ErrorFilter);
 Vue.filter("filesize", FileSizeFilter);

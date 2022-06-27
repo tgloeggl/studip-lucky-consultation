@@ -23,6 +23,7 @@ class AddTables extends Migration
         $db->exec("CREATE TABLE `luckyconsultation_dates` (
             `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `course_id` varchar(32) NOT NULL,
+            `user_id` varchar(32) NULL,
             `description` varchar(255) NOT NULL,
             `start` datetime NOT NULL,
             `end` datetime NOT NULL,
@@ -30,6 +31,14 @@ class AddTables extends Migration
             `mkdate` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
             `chdate` datetime NOT NULL,
             FOREIGN KEY (`pool`) REFERENCES `luckyconsultation_pools` (`id`)  ON DELETE SET NULL ON UPDATE CASCADE
+        )");
+
+        $db->exec("CREATE TABLE `luckyconsultation_waitinglist` (
+            `id` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `dates_id` int NOT NULL,
+            `user_id` varchar(32) NOT NULL,
+            UNIQUE `dates_id_user_id` (`dates_id`, `user_id`),
+            FOREIGN KEY (`dates_id`) REFERENCES `luckyconsultation_dates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
         )");
 
         SimpleORMap::expireTableScheme();
@@ -41,5 +50,6 @@ class AddTables extends Migration
 
         $db->exec("DROP TABLE `luckyconsultation_dates`");
         $db->exec("DROP TABLE `luckyconsultation_pools`");
+        $db->exec("DROP TABLE `luckyconsultation_waitinglist`");
     }
 }

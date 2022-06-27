@@ -1,5 +1,6 @@
 <template>
     <div>
+        <form class="default" @submit.prevent>
         <div>
             <h1>Lospools</h1>
             <studip-button icon="add" @click="cancelPoolEdit();addPool = true">
@@ -8,9 +9,9 @@
 
             <table class="default" v-if="addPool || (pools && pools.length) ">
                 <colgroup>
-                    <col width="40%">
-                    <col width="45%">
-                    <col width="15%">
+                    <col width="25%">
+                    <col width="55%">
+                    <col width="20%">
                 </colgroup>
                 <thead>
                     <tr>
@@ -119,10 +120,12 @@
 
              <table class="default" v-if="addDate || (dates && dates.length) ">
                 <colgroup>
-                    <col width="40%">
-                    <col width="30%">
-                    <col width="15%">
-                    <col width="15%">
+                    <col width="25%">
+                    <col width="25%">
+                    <col width="5%">
+                    <col width="20%">
+                    <col width="5%">
+                    <col width="20%">
                 </colgroup>
                 <thead>
                     <tr>
@@ -134,6 +137,12 @@
                         </th>
                         <th>
                             Lospool
+                        </th>
+                        <th>
+                            Zugeordnete Person
+                        </th>
+                        <th>
+                            Losliste
                         </th>
                         <th>
                             Aktionen
@@ -176,7 +185,7 @@
                             </span>
     
                             <span v-else>
-                                {{ date.attributes.start | datetime }} - {{ date.attributes.end| datetime }}
+                                {{ date.attributes.start | datetime }} - {{ date.attributes.end | time }}
                             </span>
                         </td>
 
@@ -194,7 +203,17 @@
                                 </select>
                             </span>
 
-                            {{ getPoolName(date.attributes.pool) }}
+                            <span v-else>
+                                {{ getPoolName(date.attributes.pool) }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ date.attributes.username }}
+                        </td>
+
+                        <td>
+                            {{ date.attributes.waiting }}
                         </td>
 
                         <td class="actions">
@@ -259,7 +278,7 @@
                             </select>
                         </td>
 
-                        <td class="actions">
+                        <td class="actions" colspan="3">
                             <studip-button icon="accept" @click="storeDate">
                                 Speichern
                             </studip-button>
@@ -272,6 +291,7 @@
                 </tbody>
             </table>
         </div>
+        </form>
     </div>
 </template>
 
