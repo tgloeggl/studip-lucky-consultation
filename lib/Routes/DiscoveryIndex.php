@@ -1,16 +1,16 @@
 <?php
 
-namespace LuckyConsultationsultationsultationsultation\Routes;
+namespace LuckyConsultation\Routes;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-use LuckyConsultationsLuckyConsultationsLuckyConsultationsLuckyConsultation\LuckyConsultationController;
-use LuckyConsultationsLuckyConsultationsLuckyConsultationsLuckyConsultation\LuckyConsultationTrait;
+use LuckyConsultationController;
+use LuckyConsultationTrait;
 
-class DiscoveryIndex extends LuckyConsultationsultationsultationsultationController
+class DiscoveryIndex extends LuckyConsultationController
 {
-    use LuckyConsultationsultationsultationsultationTrait;
+    use LuckyConsultationTrait;
 
     public function __invoke(Request $request, Response $response, $args)
     {

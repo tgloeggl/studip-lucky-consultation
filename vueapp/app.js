@@ -49,11 +49,11 @@ Vue.use(GetTextPlugin, {
 
 $(function() {
     window.Vue = new Vue({
-        name: 'Opencast Vue',
+        name: 'Lucky Consultation Vue',
         router,
         store,
         render: h => h(App)
-    }).$mount('#opencast');
+    }).$mount('#luckyconsultation');
 
     if (CID !== null) {
         store.dispatch('setCID', CID);

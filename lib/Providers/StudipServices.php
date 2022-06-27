@@ -1,6 +1,6 @@
 <?php
 
-namespace LuckyConsultationsultationsultation\Providers;
+namespace LuckyConsultation\Providers;
 
 use StudipAuthAbstract;
 use User;

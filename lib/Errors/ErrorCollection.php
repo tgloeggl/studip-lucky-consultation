@@ -1,6 +1,6 @@
 <?php
 
-namespace LuckyConsultationsultationsultation\Errors;
+namespace LuckyConsultation\Errors;
 
 class ErrorCollection
 {

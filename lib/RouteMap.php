@@ -1,8 +1,8 @@
 <?php
 
-namespace LuckyConsultationsultation;
+namespace LuckyConsultation;
 
-use LuckyConsultationsultationsultation\Providers\StudipServices;
+use LuckyConsultation\Providers\StudipServices;
 
 class RouteMap
 {

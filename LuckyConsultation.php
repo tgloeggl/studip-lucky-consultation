@@ -98,21 +98,6 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
         );
         $navigation->setBadgeNumber(0);
         $navigation->setDescription("Losbasierte Sprechstundenvergabe");
-        /*
-        if ($ocgetcount > 0) {
-            $navigation->setImage(
-                Icon::create($this->getPluginURL() . '/images/opencast-red.svg',
-                    Icon::ROLE_ATTENTION,
-                    ['title' => 'Opencast']
-                ));
-        } else {
-            $navigation->setImage(
-                Icon::create($this->getPluginURL() . '/images/opencast-grey.svg',
-                    Icon::ROLE_INACTIVE,
-                    ['title' => 'Opencast']
-                ));
-        }
-        */
 
         return $navigation;
     }

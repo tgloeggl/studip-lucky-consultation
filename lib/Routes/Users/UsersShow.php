@@ -1,17 +1,17 @@
 <?php
 
-namespace LuckyConsultationsultationsultation\Routes\Users;
+namespace LuckyConsultation\Routes\Users;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use LuckyConsultationsultationsultation\Errors\AuthorizationFailedException;
-use LuckyConsultationsultationsultation\Errors\Error;
-use LuckyConsultationsLuckyConsultationsLuckyConsultation\LuckyConsultationTrait;
-use LuckyConsultationsLuckyConsultationsLuckyConsultation\LuckyConsultationController;
+use LuckyConsultation\Errors\AuthorizationFailedException;
+use LuckyConsultation\Errors\Error;
+use LuckyConsultation\LuckyConsultationTrait;
+use LuckyConsultation\LuckyConsultationController;
 
-class UsersShow extends LuckyConsultationsultationsultationController
+class UsersShow extends LuckyConsultationController
 {
-    use LuckyConsultationsultationsultationTrait;
+    use LuckyConsultationTrait;
 
     public function __invoke(Request $request, Response $response, $args)
     {

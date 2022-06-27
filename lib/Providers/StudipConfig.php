@@ -1,6 +1,6 @@
 <?php
 
-namespace LuckyConsultationsultationsultation\Providers;
+namespace LuckyConsultation\Providers;
 
 class StudipConfig implements \Pimple\ServiceProviderInterface
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace LuckyConsultationsultation;
+namespace LuckyConsultation;
 
 Trait RelationshipTrait
 {
     private function getRelLink($slug)
     {
-        return \PluginEngine::getLink('LuckyConsultationsultation/api/' . $slug);
+        return \PluginEngine::getLink('LuckyConsultation/api/' . $slug);
     }
 }
