@@ -1,6 +1,6 @@
 {
   "name": "studip-lucky-consultation",
-  "version": "3.0.0",
+  "version": "0.1.0",
   "description": "Stud.IP plugin for lot based consultation hours",
   "author": "Till Glöggler <tgloeggl@uos.de>",
   "scripts": {
@@ -9,7 +9,7 @@
     "prebuild": "npm install",
     "prezip": "npm run build && composer install --no-dev",
     "translate": "gettext-extract --attribute v-i18n --attribute v-translate --output locale/en/LC_MESSAGES/lucky-consultation.pot $(find vueapp -type f -name '*.vue') && /bin/bash translate.sh && gettext-compile --output vueapp/i18n/translations.json locale/en/LC_MESSAGES/lucky-consultation.po",
-    "zip": "zip -r LuckyConsultation-V$npm_package_version.zip app assets classes cronjobs locale migrations lib vendor static LICENSE INSTALL.md README.md LuckyConsultation.class.php plugin.manifest"
+    "zip": "zip -r LuckyConsultation-V$npm_package_version.zip app migrations lib vendor static README.md LuckyConsultation.php plugin.manifest"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
