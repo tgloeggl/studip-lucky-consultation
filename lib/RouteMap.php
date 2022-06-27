@@ -36,6 +36,7 @@ class RouteMap
 
     public function adminRoutes()
     {
-        
+        $this->app->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
+        $this->app->post('/course/{course_id}/pools', Routes\Pools\PoolsAdd::class);
     }
 }

@@ -6,5 +6,5 @@ export default date => {
         return '';
     }
 
-    return format(new Date(date), "d. MMM, yyyy, HH:ii", { locale: de});
+    return format(new Date(date), "d. MMM, yyyy, HH:mm", { locale: de});
 };

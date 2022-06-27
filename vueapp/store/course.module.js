@@ -38,6 +38,20 @@ const actions = {
             .then(({ data }) => {
                 commit('setCurrentUser', data.data);
             });
+    },
+
+    async addPool({ dispatch, commit, state }, pool) {
+        return ApiService.post('course/' + state.cid + '/pools', pool)
+            .then(({ data }) => {
+                commit('setPools', data.data);
+            });
+    },
+
+    async loadPools({ dispatch, commit, state }, pool) {
+        return ApiService.get('course/' + state.cid + '/pools', pool)
+            .then(({ data }) => {
+                commit('setPools', data.data);
+            });
     }
 }
 
@@ -48,6 +62,10 @@ const mutations = {
 
     setCurrentUser(state, data) {
         state.currentUser = data;
+    },
+
+    setPools(state, pools) {
+        state.pools = pools;
     }
 }
 

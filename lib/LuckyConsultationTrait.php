@@ -51,10 +51,6 @@ Trait LuckyConsultationTrait
             'attributes' => $entry->toArray()
         ];
 
-        if (!empty($relationships = $entry->getRelationships())) {
-            $data['relationships'] = $relationships;
-        }
-
         return $data;
     }
 

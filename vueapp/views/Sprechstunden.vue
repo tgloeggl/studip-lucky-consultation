@@ -19,6 +19,19 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr v-for="pool in pools" :key="pool.id">
+                        <td>
+                            {{ pool.attributes.name }}
+                        </td>
+                        <td>
+                            {{ pool.attributes.date }} 
+                            {{ pool.attributes.date | datetime }}
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+
                     <tr v-if="addPool">
                         <td>
                             <input :class="{ 
@@ -115,6 +128,7 @@ export default {
 
     mounted() {
         this.$store.dispatch('loadCurrentUser');
+        this.$store.dispatch('loadPools');
     }
 };
 </script>
