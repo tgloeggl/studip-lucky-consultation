@@ -30,7 +30,7 @@
                         </td>
 
                         <td>
-                            {{ mydate.attributes.start | datetime }} - {{ mydate.attributes.end | time }}
+                            {{ $filters.datetime(mydate.attributes.start) }}
                         </td>
 
                         <td>
@@ -87,7 +87,7 @@
                         </td>
 
                         <td>
-                            {{ date.attributes.start | datetime }} - {{ date.attributes.end | time }}
+                            {{ $filters.datetime(date.attributes.start) }}
                         </td>
 
                         <td>
@@ -95,7 +95,7 @@
                         </td>
 
                         <td>
-                            {{ getPool(date.attributes.pool).attributes.date | datetime }}
+                            {{ $filters.datetime(getPool(date.attributes.pool).attributes.date) }}
                         </td>
 
                         <td class="actions">

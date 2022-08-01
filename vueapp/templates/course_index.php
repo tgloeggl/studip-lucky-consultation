@@ -3,11 +3,14 @@
 </div>
 
 <script type="text/javascript">
-    let API_URL  = '<?= PluginEngine::getURL('luckyconsultation', [], 'api', true) ?>';
-    let CID      = '<?= $course_id ?>';
-    let ICON_URL = '<?= Assets::url('images/icons/') ?>';
-    let ASSETS_URL = '<?= Assets::url('') ?>';
-    let PLUGIN_ASSET_URL =  '<?= $plugin->getAssetsUrl() ?>';
+    window.LuckyConsultationPlugin = {
+        API_URL    : '<?= PluginEngine::getURL('luckyconsultation', [], 'api', true) ?>',
+        CID        : '<?= $course_id ?>',
+        ICON_URL   : '<?= Assets::url('images/icons/') ?>',
+        ASSETS_URL : '<?= Assets::url('') ?>',
+        PLUGIN_ASSET_URL : '<?= $plugin->getAssetsUrl() ?>',
+        ROUTE      : 'course'
+    };
 </script>
 
 <!-- load bundles -->

@@ -1,9 +1,8 @@
-import Vue from "vue";
-import Router from "vue-router";
+import { createRouter, createWebHashHistory } from 'vue-router';
 
-Vue.use(Router);
-
-export default new Router({
+export default createRouter({
+    history: createWebHashHistory(),
+    base: window.location.pathname,
     routes: [
         {
             path: "/",
@@ -13,7 +12,7 @@ export default new Router({
 
         {
             path: "/editor",
-            name: "index",
+            name: "editor",
             component: () => import("@/views/SprechstundenEditor")
         }
     ]

@@ -1,6 +1,8 @@
 <template>
     <div>
-        <form class="default" @submit.prevent>
+        <InfoField></InfoField>
+
+        <form class="default" @submit.prevent="console.log('submit')">
         <div>
             <h1>Lospools</h1>
             <studip-button icon="add" @click="cancelPoolEdit();addPool = true">
@@ -54,7 +56,7 @@
                             </span>
 
                             <span v-else>
-                                {{ pool.attributes.date | datetime }}
+                                {{ $filters.datetime(pool.attributes.date) }}
                             </span>
                         </td>
                         <td class="actions">
@@ -185,7 +187,7 @@
                             </span>
 
                             <span v-else>
-                                {{ date.attributes.start | datetime }} - {{ date.attributes.end | time }}
+                                {{ $filters.datetime(date.attributes.start) }}
                             </span>
                         </td>
 
@@ -300,12 +302,13 @@ import { mapGetters } from "vuex";
 
 import StudipButton from '@/components/Studip/StudipButton';
 import StudipIcon from '@/components/Studip/StudipIcon';
+import InfoField from '@/components/InfoField';
 
 export default {
     name: "Sprechstunden",
 
     components: {
-        StudipButton,   StudipIcon
+        StudipButton,   StudipIcon,     InfoField
     },
 
     data() {

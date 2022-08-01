@@ -7,7 +7,8 @@ const state = {
    dates: null,
    mydates: null,
    waitinglist: null,
-   currentUser: {}
+   currentUser: {},
+   infotext: null
 }
 
 const getters = {
@@ -33,6 +34,10 @@ const getters = {
 
     currentUser(state) {
         return state.currentUser
+    },
+
+    infotext(state) {
+        return state.infotext
     }
 }
 
@@ -132,6 +137,21 @@ const actions = {
             .then(({ data }) => {
                 commit('setMyDates', data.data);
             });
+    },
+
+    async loadInfotext({ dispatch, commit }) {
+        return ApiService.get('course/' + state.cid + '/infotext')
+            .then(({ data }) => {
+                commit('setInfotext', data.infotext);
+            });
+    },
+
+    async updateInfotext({ dispatch, commit }, infotext) {
+        return ApiService.put('course/' + state.cid + '/infotext', {
+                infotext: infotext
+            }).then(({ data }) => {
+                commit('setInfotext', data.infotext);
+            });
     }
 }
 
@@ -158,7 +178,11 @@ const mutations = {
 
     setWaitingList(state, waitinglist) {
         state.waitinglist = waitinglist;
-    }
+    },
+
+    setInfotext(state, infotext) {
+        state.infotext = infotext;
+    },
 }
 
 

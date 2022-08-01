@@ -1,11 +1,4 @@
-import Vue from "vue";
-import axios from "axios";
-import VueAxios from "vue-axios";
-
 const ApiService = {
-    init() {
-        Vue.use(VueAxios, axios);
-    },
 
     query(resource, params) {
         return Vue.axios.get(resource, params);
@@ -24,6 +17,7 @@ const ApiService = {
     },
 
     put(resource, params) {
+        console.trace();
         return Vue.axios.put(`${resource}`, params);
     },
 

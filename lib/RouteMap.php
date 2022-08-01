@@ -47,6 +47,8 @@ class RouteMap
         $this->app->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
         $this->app->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
         $this->app->get('/course/{course_id}/mydates', Routes\Dates\MyDatesList::class);
+
+        $this->app->get('/course/{course_id}/infotext', Routes\Infotext\InfotextShow::class);
     }
 
     public function privilegedRoutes()
@@ -59,5 +61,7 @@ class RouteMap
         $this->app->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
         $this->app->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
         $this->app->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
+
+        $this->app->put('/course/{course_id}/infotext', Routes\Infotext\InfotextEdit::class);
     }
 }
