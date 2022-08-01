@@ -18,6 +18,10 @@
         <studip-button v-if="edit" icon="edit" @click.prevent="saveInfotext">
             Speichern
         </studip-button>
+
+        <studip-button v-if="edit" icon="edit" @click.prevent="edit = false">
+            Abbrechen
+        </studip-button>
     </div>
 </template>
 

@@ -17,7 +17,7 @@ class InfotextEdit extends LuckyConsultationController
     {
         $json = $this->getRequestData($request);
 
-        \CourseConfig::get($course->id)->store('LUCKY_CONSULTATION_INFOTEXT', $json['infotext']);
+        \CourseConfig::get($course->id)->store('LUCKY_CONSULTATION_INFOTEXT', \Studip\Markup::purifyHtml(\Studip\Markup::markAsHtml($json['infotext'])));
 
         return $this->createResponse([
             'infotext' => \CourseConfig::get($course->id)->LUCKY_CONSULTATION_INFOTEXT
