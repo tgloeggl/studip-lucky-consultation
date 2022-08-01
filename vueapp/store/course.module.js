@@ -147,6 +147,8 @@ const actions = {
     },
 
     async updateInfotext({ dispatch, commit }, infotext) {
+        commit('setInfotext', infotext);
+
         return ApiService.put('course/' + state.cid + '/infotext', {
                 infotext: infotext
             }).then(({ data }) => {
