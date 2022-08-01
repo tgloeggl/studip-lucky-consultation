@@ -1,5 +1,5 @@
 <template>
-    <button class="button" :class="[icon]" type="submit" :name="name" @click="onClick($event)">
+    <button class="button" :class="[icon]" type="submit" :name="name">
         <slot>ButtonLabel</slot>
     </button>
 </template>
@@ -17,11 +17,6 @@ export default {
                 return ['', 'accept', 'cancel', 'edit', 'move-up', 'move-down', 'add', 'download', 'search'].includes(value)
             },
             default: ''
-        }
-    },
-    methods: {
-        onClick(event) {
-            this.$emit('click', event);
         }
     }
 }

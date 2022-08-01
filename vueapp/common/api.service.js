@@ -17,7 +17,6 @@ const ApiService = {
     },
 
     put(resource, params) {
-        console.trace();
         return Vue.axios.put(`${resource}`, params);
     },
 
