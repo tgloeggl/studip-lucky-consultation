@@ -25,15 +25,28 @@ class DatesList extends LuckyConsultationController
             $my_dates = new \SimpleCollection(Dates::findByUser_id($user->id));
             $pool_ids = $my_dates->pluck('pool');
 
-            $dates = Dates::findBySql('JOIN luckyconsultation_pools AS lp
-                ON (lp.id = pool)
-                WHERE luckyconsultation_dates.course_id = :course_id
-                    AND lp.date > NOW()
-                    AND luckyconsultation_dates.start > NOW()
-                    AND pool NOT IN (' . implode(', ', $pool_ids) . ')',
-            [
-                'course_id' => $args['course_id']
-            ]);
+            if (!empty($pool_ids)) {
+                $dates = Dates::findBySql('JOIN luckyconsultation_pools AS lp
+                    ON (lp.id = pool)
+                    WHERE luckyconsultation_dates.course_id = :course_id
+                        AND lp.date > NOW()
+                        AND luckyconsultation_dates.start > NOW()
+                        AND pool NOT IN (' . implode(', ', $pool_ids) . ')',
+                    [
+                    'course_id' => $args['course_id']
+                    ]
+                );
+            } else {
+                $dates = Dates::findBySql('JOIN luckyconsultation_pools AS lp
+                    ON (lp.id = pool)
+                    WHERE luckyconsultation_dates.course_id = :course_id
+                        AND lp.date > NOW()
+                        AND luckyconsultation_dates.start > NOW()',
+                    [
+                    'course_id' => $args['course_id']
+                    ]
+                );
+            }
         }
 
         return $this->createResponse($this->toArray($dates), $response);

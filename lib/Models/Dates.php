@@ -18,7 +18,10 @@ class Dates extends UPMap
             'assoc_foreign_key' => 'dates_id'
         ];
 
-        //$config['additional_fields']['username'] = ['user', 'getFullName'];
+        //$config['additional_fields']['username']['get'] = 'getUsername';
+
+        $config['additional_fields']['username']['get'] = 'getUsername';
+        $config['additional_fields']['fullname']['get'] = 'getFullname';
         $config['additional_fields']['waiting']['get']  = 'countWaitingList';
 
         parent::configure($config);
@@ -27,5 +30,15 @@ class Dates extends UPMap
     public function countWaitinglist()
     {
         return sizeof($this->waitinglist);
+    }
+
+    public function getFullname()
+    {
+        return $this->user->getFullName();
+    }
+
+    public function getUsername()
+    {
+        return $this->user->username;
     }
 }

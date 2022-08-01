@@ -1,5 +1,7 @@
 <template>
     <div>
+        <span class="infotext" v-html="infotext"></span>
+
         <form class="default" @submit.prevent>
         <div v-if="pools && pools.length && mydates && mydates.length">
             <h1>Meine Termine</h1>
@@ -16,7 +18,7 @@
                             Beschreibung
                         </th>
                         <th>
-                            Zeitraum
+                            Zeitpunkt
                         </th>
                         <th>
                             Lospool
@@ -60,7 +62,7 @@
                             Beschreibung
                         </th>
                         <th>
-                            Zeitraum
+                            Zeitpunkt
                         </th>
                         <th>
                             Lospool
@@ -119,6 +121,12 @@
             </table>
         </div>
         </form>
+
+        <div v-if="(pools && !pools.length) || (dates && !dates.length)">
+            <MessageBox type="info">
+                 Es sind momentan keine Termine vorhanden.
+            </MessageBox>
+        </div>
     </div>
 </template>
 
@@ -127,16 +135,18 @@ import { mapGetters } from "vuex";
 
 import StudipButton from '@/components/Studip/StudipButton';
 import StudipIcon from '@/components/Studip/StudipIcon';
+import MessageBox from '@/components/MessageBox';
+
 
 export default {
     name: "Sprechstunden",
 
     components: {
-        StudipButton,   StudipIcon
+        StudipButton,   StudipIcon,     MessageBox
     },
 
     computed: {
-        ...mapGetters(['cid', 'pools', 'dates', 'waitinglist', 'mydates']),
+        ...mapGetters(['cid', 'pools', 'dates', 'waitinglist', 'mydates', 'infotext']),
 
         waitinglist_ids() {
             let list = {};
@@ -181,6 +191,7 @@ export default {
         this.$store.dispatch('loadDates');
         this.$store.dispatch('loadMyDates');
         this.$store.dispatch('loadWaitingList');
+        this.$store.dispatch('loadInfotext');
     }
 };
 </script>

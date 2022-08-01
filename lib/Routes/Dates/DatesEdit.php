@@ -21,12 +21,11 @@ class DatesEdit extends LuckyConsultationController
         $json = $this->getRequestData($request);
 
         $date = Dates::find($json['id']);
-        
+
         if ($date->course_id == $args['course_id']) {
             $date->setData([
                 'description' => $json['description'],
                 'start'       => $json['start'],
-                'end'         => $json['end'],
                 'pool'        => $json['pool']
             ]);
             $date->store();

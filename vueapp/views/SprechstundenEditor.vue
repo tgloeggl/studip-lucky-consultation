@@ -135,7 +135,7 @@
                             Beschreibung
                         </th>
                         <th>
-                            Zeitraum
+                            Zeitpunkt
                         </th>
                         <th>
                             Lospool
@@ -177,13 +177,6 @@
                                     type="datetime-local"
                                     v-model="currentDate.start"
                                 >
-                                -
-                                <input :class="{
-                                        invalid: !dateValidation.end
-                                    }"
-                                    type="datetime-local"
-                                    v-model="currentDate.end"
-                                >
                             </span>
 
                             <span v-else>
@@ -211,7 +204,9 @@
                         </td>
 
                         <td>
-                            {{ date.attributes.username }}
+                            <a target="_blank" :href="getUserLink(date.attributes.username)">
+                                {{ date.attributes.fullname }}
+                            </a>
                         </td>
 
                         <td>
@@ -257,13 +252,6 @@
                                 }"
                                 type="datetime-local"
                                 v-model="currentDate.start"
-                            >
-                            -
-                            <input :class="{
-                                    invalid: !dateValidation.end
-                                }"
-                                type="datetime-local"
-                                v-model="currentDate.end"
                             >
                         </td>
 
@@ -327,13 +315,11 @@ export default {
             currentDate: {
                 description: '',
                 start      : null,
-                end        : null,
                 pool       : null
             },
             dateValidation: {
                 description: true,
                 start      : true,
-                end        : true,
                 pool       : true
             }
         }
@@ -415,7 +401,6 @@ export default {
             this.dateValidation = {
                 description: true,
                 start      : true,
-                end        : true,
                 pool       : true
             }
 
@@ -428,11 +413,6 @@ export default {
 
             if (this.currentDate.start == null) {
                 this.dateValidation.start = false;
-                validated = false;
-            }
-
-            if (this.currentDate.end == null) {
-                this.dateValidation.end = false;
                 validated = false;
             }
 
@@ -469,7 +449,6 @@ export default {
                 id         : date.id,
                 description: date.attributes.description,
                 start      : date.attributes.start,
-                end        : date.attributes.end,
                 pool       : date.attributes.pool,
             }
         },
@@ -478,11 +457,15 @@ export default {
             this.currentDate = {
                 description: '',
                 start      : null,
-                end        : null,
                 pool       : null
             }
 
             this.addDate = false;
+        },
+
+        getUserLink(username) {
+            console.log(window.STUDIP);
+            return STUDIP.URLHelper.getURL('dispatch.php/profile/index/?username=' + username, { cid: null });
         }
     },
 
