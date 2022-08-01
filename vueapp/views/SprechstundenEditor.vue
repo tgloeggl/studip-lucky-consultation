@@ -2,7 +2,7 @@
     <div>
         <InfoField></InfoField>
 
-        <form class="default" @submit.prevent="console.log('submit')">
+        <form class="default" @submit.prevent>
         <div>
             <h1>Lospools</h1>
             <studip-button icon="add" @click="cancelPoolEdit();addPool = true">
