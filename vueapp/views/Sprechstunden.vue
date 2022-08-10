@@ -124,7 +124,7 @@
 
         <div v-if="(pools && !pools.length) || (dates && !dates.length)">
             <MessageBox type="info">
-                 Es sind momentan keine Termine vorhanden.
+                 Es sind momentan keine weiteren Sprechstundentermine vorhanden, für die sie sich eintragen können.
             </MessageBox>
         </div>
     </div>

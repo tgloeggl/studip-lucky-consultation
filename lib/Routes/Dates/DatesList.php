@@ -19,7 +19,7 @@ class DatesList extends LuckyConsultationController
         global $user, $perm;
 
         if ($perm->have_studip_perm('tutor', $args['course_id'])) {
-            $dates = Dates::findByCourse_id($args['course_id']);
+            $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);
         } else {
             // check, if user has already a date in one or many of the pools
             $my_dates = new \SimpleCollection(Dates::findByUser_id($user->id));

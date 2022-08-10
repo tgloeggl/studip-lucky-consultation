@@ -10,7 +10,7 @@ use LuckyConsultation\LuckyConsultationTrait;
 use LuckyConsultation\LuckyConsultationController;
 use LuckyConsultation\Models\Dates;
 
-class DatesEdit extends LuckyConsultationController
+class DatesDeleteUser extends LuckyConsultationController
 {
     use LuckyConsultationTrait;
 
@@ -18,22 +18,16 @@ class DatesEdit extends LuckyConsultationController
     {
         global $user;
 
-        $json = $this->getRequestData($request);
-
-        $date = Dates::find($json['id']);
+        $date = Dates::find($args['date_id']);
 
         if (!empty($date) && $date->course_id == $args['course_id']) {
-            $date->setData([
-                'description' => $json['description'],
-                'start'       => $json['start'],
-                'pool'        => $json['pool']
-            ]);
+            $date->user_id = null;
             $date->store();
         } else {
             throw new Error('Access Denied', 403);
         }
 
-        $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);
+        $dates = Dates::findByCourse_id($args['course_id']);
 
         return $this->createResponse($this->toArray($dates), $response);
     }

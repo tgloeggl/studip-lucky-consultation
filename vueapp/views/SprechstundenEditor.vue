@@ -57,6 +57,9 @@
 
                             <span v-else>
                                 {{ $filters.datetime(pool.attributes.date) }}
+                                <span v-if="pool.attributes.lots_drawn == 1">
+                                    (wurde gelost)
+                                </span>
                             </span>
                         </td>
                         <td class="actions">
@@ -206,6 +209,9 @@
                         <td>
                             <a target="_blank" :href="getUserLink(date.attributes.username)">
                                 {{ date.attributes.fullname }}
+                            </a>
+                            <a v-if="date.attributes.username" href="#" @click.prevent="deleteUserFromDate(date)">
+                                <studip-icon shape="trash"/>
                             </a>
                         </td>
 
@@ -441,6 +447,12 @@ export default {
         deleteDate(date) {
             if (confirm('Sind sie sicher, dass sie den Zeiteintrag "' + date.attributes.description + '" löschen möchten?')) {
                 this.$store.dispatch('deleteDate', date.id);
+            }
+        },
+
+        deleteUserFromDate(date) {
+            if (confirm('Sind sie sicher, dass sie den/die Nutzer/in "' + date.attributes.fullname + '" aus dem Zeiteintrag "' + date.attributes.description + '" löschen möchten?')) {
+                this.$store.dispatch('deleteUserFromDate', date.id);
             }
         },
 

@@ -61,6 +61,7 @@ class RouteMap
         $this->app->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
         $this->app->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
         $this->app->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
+        $this->app->delete('/course/{course_id}/dates/{date_id}/user', Routes\Dates\DatesDeleteUser::class);
 
         $this->app->put('/course/{course_id}/infotext', Routes\Infotext\InfotextEdit::class);
     }

@@ -21,8 +21,12 @@ class PoolsEdit extends LuckyConsultationController
         $json = $this->getRequestData($request);
 
         $pool = Pools::find($json['id']);
-        
+
         if ($pool->course_id == $args['course_id']) {
+            if ($pool->date != $json['date']) {
+                $pool->lots_drawn = 0;
+            }
+
             $pool->setData([
                 'name' => $json['name'],
                 'date' => $json['date']

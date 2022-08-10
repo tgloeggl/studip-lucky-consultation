@@ -125,6 +125,13 @@ const actions = {
             });
     },
 
+    async deleteUserFromDate({ dispatch, commit, state }, id) {
+        return ApiService.delete('course/' + state.cid + '/dates/' + id + '/user')
+            .then(({ data }) => {
+                commit('setDates', data.data);
+            });
+    },
+
     async loadDates({ dispatch, commit, state }, date) {
         return ApiService.get('course/' + state.cid + '/dates', date)
             .then(({ data }) => {

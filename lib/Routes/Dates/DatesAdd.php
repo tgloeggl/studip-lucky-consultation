@@ -25,7 +25,7 @@ class DatesAdd extends LuckyConsultationController
         $date->course_id = $args['course_id'];
         $date->store();
 
-        $dates = Dates::findByCourse_id($args['course_id']);
+        $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);
 
         return $this->createResponse($this->toArray($dates), $response);
     }
