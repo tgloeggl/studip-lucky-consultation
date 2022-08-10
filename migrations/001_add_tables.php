@@ -16,7 +16,7 @@ class AddTables extends Migration
             `course_id` varchar(32) NOT NULL,
             `name` varchar(255) NOT NULL,
             `date` datetime NOT NULL,
-            'lots_drawn' tinyint NOT NULL DEFAULT '0',
+            `lots_drawn` tinyint NOT NULL DEFAULT '0',
             `mkdate` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
             `chdate` datetime NOT NULL
         )");

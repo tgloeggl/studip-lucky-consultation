@@ -34,11 +34,15 @@ class Dates extends UPMap
 
     public function getFullname()
     {
-        return $this->user->getFullName();
+        if ($this->user) {
+            return $this->user->getFullName();
+        }
     }
 
     public function getUsername()
     {
-        return $this->user->username;
+        if ($this->user) {
+            return $this->user->username;
+        }
     }
 }
