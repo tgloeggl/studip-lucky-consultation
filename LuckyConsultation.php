@@ -182,8 +182,8 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
         $metadata['pluginname'] = $this->_("Losbasierte Sprechstundenvergabe");
         $metadata['displayname'] = $this->_("Losbasierte Sprechstundenvergabe");
 
-        $metadata['description'] = $this->_('Anhand von frei konfigurierbaren Termine und zusätzlicher möglicher Aufteilung in verschiedene Lospools '
-            .'können sich bei diesem Tool Studierende für Termine auf die Warteliste dieser Termine setzen lassen. Es wird dann zu einstellbaren Zeitpunkten '
+        $metadata['description'] = $this->_('Anhand von frei konfigurierbaren Terminen und zusätzlicher möglicher Aufteilung in verschiedene Lospools '
+            .'können sich bei diesem Tool Studierende auf die Warteliste dieser Termine setzen lassen. Es wird dann zu einstellbaren Zeitpunkten '
             . 'ausgelost, wer den jeweiligen Termin bekommt.');
 
         $metadata['summary'] = $this->_("Losbasierte Sprechstundenvergabe");
