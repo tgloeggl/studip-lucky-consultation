@@ -29,9 +29,10 @@ class DatesList extends LuckyConsultationController
                 $dates = Dates::findBySql('JOIN luckyconsultation_pools AS lp
                     ON (lp.id = pool)
                     WHERE luckyconsultation_dates.course_id = :course_id
-                        AND lp.date > NOW()
+                        AND (lp.date > NOW() OR lots_drawn = 0)
                         AND luckyconsultation_dates.start > NOW()
-                        AND pool NOT IN (' . implode(', ', $pool_ids) . ')',
+                        AND pool NOT IN (' . implode(', ', $pool_ids) . ')
+                        AND user_id IS NULL',
                     [
                     'course_id' => $args['course_id']
                     ]
@@ -40,8 +41,9 @@ class DatesList extends LuckyConsultationController
                 $dates = Dates::findBySql('JOIN luckyconsultation_pools AS lp
                     ON (lp.id = pool)
                     WHERE luckyconsultation_dates.course_id = :course_id
-                        AND lp.date > NOW()
-                        AND luckyconsultation_dates.start > NOW()',
+                        AND (lp.date > NOW() OR lots_drawn = 0)
+                        AND luckyconsultation_dates.start > NOW()
+                        AND user_id IS NULL',
                     [
                     'course_id' => $args['course_id']
                     ]

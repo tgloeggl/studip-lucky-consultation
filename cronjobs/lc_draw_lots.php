@@ -28,16 +28,41 @@ class DrawLots extends CronJob
             foreach ($pool->dates as $date) {
                 $list = $date->waitinglist->toArray();
 
-                $num = random_int(0, sizeof($list) - 1);
-                $winner = $list[$num];
+                if (!empty($list)) {
+                    $num = random_int(0, sizeof($list) - 1);
+                    $winner = $list[$num];
 
-                echo "Date: ({$date->id}) {$date->start}, Winner is: {$winner['user_id']}, Lot number: $num\n";
+                    echo "Date: ({$date->id}) {$date->start}, Winner is: {$winner['user_id']}, Lot number: $num\n";
 
-                $date->user_id = $winner['user_id'];
-                $date->store();
+                    $date->user_id = $winner['user_id'];
+                    $date->store();
 
-                $date->waitinglist = [];
-                WaitingList::deleteByDates_id($date->id);
+                    // delete user from all other dates of the same pool
+                    $entries = new \SimpleCollection(WaitingList::findBySQL('JOIN luckyconsultation_dates AS ld
+                        ON (dates_id = ld.id)
+                        WHERE
+                            luckyconsultation_waitinglist.user_id = :user_id
+                            AND ld.pool = :pool_id',
+                        [
+                            ':user_id' => $winner['user_id'],
+                            ':pool_id' => $date->pool
+                        ]
+                    ));
+
+                    $date_ids = $entries->pluck('dates_id');
+
+                    WaitingList::deleteBySQL('dates_id IN ('
+                        . implode(', ', $date_ids)
+                        . ') AND user_id = :user_id',
+                        [
+                            ':user_id' => $winner['user_id']
+                        ]
+                    );
+
+                    // clear waitinglist for this date
+                    $date->waitinglist = [];
+                    WaitingList::deleteByDates_id($date->id);
+                }
             }
 
             $pool->lots_drawn = 1;
