@@ -26,5 +26,13 @@ class AddCronjob extends Migration
         }
     }
 
-    function down() {}
+    function down()
+    {
+        $scheduler = CronjobScheduler::getInstance();
+
+        if ($task_id = CronjobTask::findByFilename(self::BASE_DIR . 'lc_draw_lots.php')[0]->task_id) {
+            $scheduler->cancelByTask($task_id);
+            $scheduler->unregisterTask($task_id);
+        }
+    }
 }

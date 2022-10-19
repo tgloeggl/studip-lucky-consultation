@@ -485,6 +485,15 @@ export default {
         this.$store.dispatch('loadCurrentUser');
         this.$store.dispatch('loadPools');
         this.$store.dispatch('loadDates');
+    },
+
+    beforeRouteEnter (to, from) {
+        if (!window.LuckyConsultationPlugin.PERMS) {
+            return '/';
+        }
+
+        return true;
     }
+
 };
 </script>

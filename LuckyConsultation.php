@@ -5,8 +5,11 @@
 
 use LuckyConsultation\AppFactory;
 use LuckyConsultation\RouteMap;
+use LuckyConsultation\Models\Dates;
+use LuckyConsultation\Models\Pools;
+use LuckyConsultation\Models\WaitingList;
 
-class LuckyConsultation extends StudipPlugin implements StandardPlugin
+class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyPlugin, SystemPlugin
 {
     const GETTEXT_DOMAIN = 'lucky-consultation';
 
@@ -18,6 +21,11 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
     public function __construct()
     {
         parent::__construct();
+
+        NotificationCenter::addObserver($this, 'userDidDelete', 'UserDidDelete');
+        NotificationCenter::addObserver($this, 'courseDidDelete', 'CourseDidDelete');
+        NotificationCenter::addObserver($this, 'userDidLeaveCourse', 'UserDidLeaveCourse');
+        NotificationCenter::addObserver($this, 'userDidMigrate', 'UserDidMigrate');
 
         bindtextdomain(static::GETTEXT_DOMAIN, $this->getPluginPath() . '/locale');
         bind_textdomain_codeset(static::GETTEXT_DOMAIN, 'UTF-8');
@@ -128,15 +136,7 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
             return;
         }
 
-        //$ocmodel = new OCCourseModel($course_id);
         $title   = 'Losbasierte Sprechstunden';
-        /*
-        if ($ocmodel->getSeriesVisibility() == 'invisible') {
-            $title .= " (". $this->_('versteckt'). ")";
-        }
-        */
-
-
         $main    = new Navigation($title);
 
         if ($GLOBALS['perm']->have_studip_perm('tutor', $course_id)) {
@@ -207,6 +207,7 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
      */
     public function isActivatableForContext(Range $context)
     {
+
         if ($context->getRangeType() === 'course' &&
             $context->getSemClass()['studygroup_mode']) {
             return false;
@@ -215,29 +216,82 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin
             return false;
         }
 
-        return true;
+        // check, if course belongs to the correct institute
+        // 08422bc3d757b8d2f63d97d306013f83 -  Klinische Psychologie und Psychotherapie
+        if ($context->getRangeType() === 'course'
+            && $context->home_institut->id == '08422bc3d757b8d2f63d97d306013f83'
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
-    public function cleanCourse($event, $course)
+    /**
+     * Export available data of a given user into a storage object
+     * (an instance of the StoredUserData class) for that user.
+     *
+     * @param StoredUserData $storage object to store data into
+     */
+    public function exportUserData(StoredUserData $storage)
     {
-        //TODO
-        /*
-        $course_id = $course->getId();
-        OCScheduledRecordings::deleteBySQL('seminar_id = ?', [$course_id]);
-        OCSeminarEpisodes::deleteBySQL('seminar_id = ?', [$course_id]);
-        OCSeminarSeries::deleteBySQL('seminar_id = ?', [$course_id]);
-        OCSeminarWorkflowConfiguration::deleteBySQL('seminar_id = ?', [$course_id]);
-        OCTos::deleteBySQL('seminar_id = ?', [$course_id]);
+        $field_data = DBManager::get()->fetchAll("SELECT * FROM luckyconsultation_dates WHERE user_id = ?", [$storage->user_id]);
+        if ($field_data) {
+            $storage->addTabularData(_('Losbasierte Sprechstundenvergabe - Einträge'), 'luckyconsultation_dates', $field_data);
+        }
 
-        if ($course_link = OCUploadStudygroup::findOneBySQL('course_id = ?', [$course_id])) {
-            $studygroup_id = $course_link['studygroup_id'];
-            $course_link->delete();
-            Course::find($studygroup_id)->delete();
+        $field_data = DBManager::get()->fetchAll("SELECT * FROM luckyconsultation_waitinglist WHERE user_id = ?", [$storage->user_id]);
+        if ($field_data) {
+            $storage->addTabularData(_('Losbasierte Sprechstundenvergabe - Einträge'), 'luckyconsultation_waitinglist', $field_data);
         }
-        else if ($studygroup_link = OCUploadStudygroup::findOneBySQL('studygroup_id = ?', [$course_id])) {
-            $studygroup_link->delete();
+    }
+
+    public function userDidDelete($event, $user)
+    {
+        require_once __DIR__ . '/vendor/autoload.php';
+
+        $db = DBManager::get();
+        $db->execute('UPDATE luckyconsultation_dates SET user_id = NULL WHERE user_id = ?', [$user_id]);
+
+        WaitingList::deleteBySQL('user_id = ?', [$user->id]);
+    }
+
+    public function courseDidDelete($event, $course)
+    {
+        require_once __DIR__ . '/vendor/autoload.php';
+
+        Dates::deleteBySQL('course_id = ?', [$course->id]);
+        Pools::deleteBySQL('course_id = ?', [$course->id]);
+    }
+
+    public function userDidLeaveCourse($event, $course_id, $user_id)
+    {
+        require_once __DIR__ . '/vendor/autoload.php';
+
+        $db = DBManager::get();
+        $db->execute('UPDATE luckyconsultation_dates SET user_id = NULL WHERE user_id = ?', [$user_id]);
+
+        // find all pools for the course
+        $pools = Pools::findByCourse_id($course_id);
+
+        foreach ($pools as $pool) {
+            foreach ($pool->dates as $date) {
+                foreach ($date->waitinglist as $entry)
+                if ($entry->user_id == $user_id) {
+                    $entry->delete();
+                }
+            }
         }
-        */
+    }
+
+    public function userDidMigrate($event, $user_id, $new_id)
+    {
+        require_once __DIR__ . '/vendor/autoload.php';
+
+        $db = DBManager::get();
+
+        $db->execute("UPDATE luckyconsultation_dates       SET user_id = ? WHERE user_id = ?", [$new_id, $user_id]);
+        $db->execute("UPDATE luckyconsultation_waitinglist SET user_id = ? WHERE user_id = ?", [$new_id, $user_id]);
     }
 
     /**
