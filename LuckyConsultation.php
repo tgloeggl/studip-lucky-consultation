@@ -269,7 +269,9 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
         require_once __DIR__ . '/vendor/autoload.php';
 
         $db = DBManager::get();
-        $db->execute('UPDATE luckyconsultation_dates SET user_id = NULL WHERE user_id = ?', [$user_id]);
+        $db->execute('UPDATE luckyconsultation_dates
+            SET user_id = NULL
+            WHERE user_id = ? AND course_id = ?', [$user_id, $course_id]);
 
         // find all pools for the course
         $pools = Pools::findByCourse_id($course_id);
