@@ -1,7 +1,7 @@
 pluginname=LuckyConsultation
 pluginclassname=LuckyConsultation
 origin=gundk.it
-version=1.0
+version=1.1
 studipMinVersion=5.0
 studipMaxVersion=5.2.99
 summary = Losbasierte Sprechstundenvergabe
