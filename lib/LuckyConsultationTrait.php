@@ -12,7 +12,8 @@ Trait LuckyConsultationTrait
     {
         $body = (string) $request->getBody();
         if ('' === $body) {
-            throw new UnprocessableEntityException('Empty request', 500);
+            //throw new UnprocessableEntityException('Empty request', 500);
+            return false;
         }
         $result = json_decode($body, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -31,11 +32,11 @@ Trait LuckyConsultationTrait
 
     public function createResponse($data, $response)
     {
+        $response->getBody()->write(json_encode($data));
         return $response->withHeader(
             'Content-Type',
-            'application/vnd.api+json'
-        )
-        ->write(json_encode($data));
+            'application/json'
+        );
     }
 
     public function createEmptyResponse($response)

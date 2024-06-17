@@ -2,67 +2,66 @@
 
 namespace LuckyConsultation;
 
-use LuckyConsultation\Providers\StudipServices;
+use Psr\Container\ContainerInterface;
+use Slim\Routing\RouteCollectorProxy;
 
 class RouteMap
 {
-    public function __construct(\Slim\App $app)
+    public function __construct(ContainerInterface $container)
     {
-        $this->app = $app;
+        $this->container = $container;
     }
 
-    public function __invoke()
+    public function __invoke(RouteCollectorProxy $group)
     {
-        $container = $this->app->getContainer();
-
-        $this->app->group('', [$this, 'authenticatedRoutes'])
-            ->add(new Middlewares\Authentication($container[StudipServices::AUTHENTICATOR]))
+        $group->group('', [$this, 'authenticatedRoutes'])
+            ->add(new Middlewares\Authentication($this->container->get("studip-authenticator")))
             ->add(new Middlewares\RemoveTrailingSlashes);
 
 
-        $this->app->group('', [$this, 'courseRoutes'])
+        $group->group('', [$this, 'courseRoutes'])
             ->add(new Middlewares\CheckCourse('autor'))
-            ->add(new Middlewares\Authentication($container[StudipServices::AUTHENTICATOR]))
+            ->add(new Middlewares\Authentication($this->container->get("studip-authenticator")))
             ->add(new Middlewares\RemoveTrailingSlashes);
 
-        $this->app->group('', [$this, 'privilegedRoutes'])
+        $group->group('', [$this, 'privilegedRoutes'])
             ->add(new Middlewares\CheckCourse('tutor'))
-            ->add(new Middlewares\Authentication($container[StudipServices::AUTHENTICATOR]))
+            ->add(new Middlewares\Authentication($this->container->get("studip-authenticator")))
             ->add(new Middlewares\RemoveTrailingSlashes);
 
-        $this->app->get('/discovery', Routes\DiscoveryIndex::class);
+        $group->get('/discovery', Routes\DiscoveryIndex::class);
     }
 
-    public function authenticatedRoutes()
+    public function authenticatedRoutes(RouteCollectorProxy $group)
     {
-        $this->app->get('/user', Routes\Users\UsersShow::class);
+        $group->get('/user', Routes\Users\UsersShow::class);
     }
 
-    public function courseRoutes()
+    public function courseRoutes(RouteCollectorProxy $group)
     {
-        $this->app->get('/course/{course_id}/waitinglist', Routes\Dates\WaitingList::class);
-        $this->app->put('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListAdd::class);
-        $this->app->delete('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListDelete::class);
+        $group->get('/course/{course_id}/waitinglist', Routes\Dates\WaitingList::class);
+        $group->put('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListAdd::class);
+        $group->delete('/course/{course_id}/waitinglist/{date_id}', Routes\Dates\WaitingListDelete::class);
 
-        $this->app->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
-        $this->app->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
-        $this->app->get('/course/{course_id}/mydates', Routes\Dates\MyDatesList::class);
+        $group->get('/course/{course_id}/pools', Routes\Pools\PoolsList::class);
+        $group->get('/course/{course_id}/dates', Routes\Dates\DatesList::class);
+        $group->get('/course/{course_id}/mydates', Routes\Dates\MyDatesList::class);
 
-        $this->app->get('/course/{course_id}/infotext', Routes\Infotext\InfotextShow::class);
+        $group->get('/course/{course_id}/infotext', Routes\Infotext\InfotextShow::class);
     }
 
-    public function privilegedRoutes()
+    public function privilegedRoutes(RouteCollectorProxy $group)
     {
-        $this->app->post('/course/{course_id}/pools', Routes\Pools\PoolsAdd::class);
-        $this->app->put('/course/{course_id}/pools', Routes\Pools\PoolsEdit::class);
-        $this->app->delete('/course/{course_id}/pools/{pool_id}', Routes\Pools\PoolsDelete::class);
+        $group->post('/course/{course_id}/pools', Routes\Pools\PoolsAdd::class);
+        $group->put('/course/{course_id}/pools', Routes\Pools\PoolsEdit::class);
+        $group->delete('/course/{course_id}/pools/{pool_id}', Routes\Pools\PoolsDelete::class);
 
 
-        $this->app->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
-        $this->app->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
-        $this->app->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
-        $this->app->delete('/course/{course_id}/dates/{date_id}/user', Routes\Dates\DatesDeleteUser::class);
+        $group->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
+        $group->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
+        $group->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
+        $group->delete('/course/{course_id}/dates/{date_id}/user', Routes\Dates\DatesDeleteUser::class);
 
-        $this->app->put('/course/{course_id}/infotext', Routes\Infotext\InfotextEdit::class);
+        $group->put('/course/{course_id}/infotext', Routes\Infotext\InfotextEdit::class);
     }
 }
