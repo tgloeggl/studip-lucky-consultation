@@ -43,7 +43,6 @@ export const mutations = {
     removeMessage(state, id) {
         for (let msg_id in state.messages) {
             if (state.messages[msg_id].id == id) {
-                console.log(state.messages[msg_id]);
                 state.messages.splice(msg_id, 1);
             }
         }

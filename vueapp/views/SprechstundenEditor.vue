@@ -476,7 +476,6 @@ export default {
         },
 
         getUserLink(username) {
-            console.log(window.STUDIP);
             return STUDIP.URLHelper.getURL('dispatch.php/profile/index/?username=' + username, { cid: null });
         }
     },

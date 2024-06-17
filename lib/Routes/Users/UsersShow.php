@@ -24,7 +24,8 @@ class UsersShow extends LuckyConsultationController
             'status'   => $user->perms,
             'admin'    => \RolePersistence::isAssignedRole(
                 $GLOBALS['user']->user_id,
-                $this->container['roles']['admin'])
+                $this->container->get('roles')['admin']
+            )
         ];
 
         return $this->createResponse([

@@ -1,15 +1,7 @@
 {
     "name": "gundk.it/studip-lucky-consultation",
     "description": "lotbased appointments",
-    "config": {
-        "platform": {
-            "php": "7.2.0"
-        }
-    },
-    "require": {
-        "slim/slim": "^3.12"
-    },
-    "autoload": {
+	"autoload": {
         "psr-4": {
             "ElanEv\\": "",
             "LuckyConsultation\\": "lib/"
