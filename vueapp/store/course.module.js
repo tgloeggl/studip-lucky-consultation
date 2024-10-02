@@ -2,13 +2,18 @@ import ApiService from "@/common/api.service";
 
 
 const state = {
-   cid: null,
-   pools: null,
-   dates: null,
-   mydates: null,
-   waitinglist: null,
-   currentUser: {},
-   infotext: null
+    cid: null,
+    pools: null,
+    dates: null,
+    mydates: null,
+    waitinglist: null,
+    currentUser: {},
+    infotext: null,
+    templates: {
+        PP : {},
+        KJP: {}
+    },
+    search_users: []
 }
 
 const getters = {
@@ -38,6 +43,14 @@ const getters = {
 
     infotext(state) {
         return state.infotext
+    },
+
+    templates(state) {
+        return state.templates
+    },
+
+    search_users(state) {
+        return state.search_users
     }
 }
 
@@ -104,15 +117,8 @@ const actions = {
             });
     },
 
-    async addDate({ dispatch, commit, state }, date) {
-        return ApiService.post('course/' + state.cid + '/dates', date)
-            .then(({ data }) => {
-                commit('setDates', data.data);
-            });
-    },
-
-    async editDate({ dispatch, commit, state }, date) {
-        return ApiService.put('course/' + state.cid + '/dates', date)
+    async editDates({ dispatch, commit, state }, dates) {
+        return ApiService.post('course/' + state.cid + '/dates', dates)
             .then(({ data }) => {
                 commit('setDates', data.data);
             });
@@ -161,6 +167,26 @@ const actions = {
             }).then(({ data }) => {
                 commit('setInfotext', data.infotext);
             });
+    },
+
+    async loadTemplates({ dispatch, commit }) {
+        return ApiService.get('templates/' + state.cid)
+            .then(({ data }) => {
+                commit('setTemplates', data.data);
+            });
+    },
+
+    async storeTemplates({ dispatch, commit }, templates) {
+        return ApiService.post('templates/' + state.cid, {
+            templates: templates
+        });
+    },
+
+    async searchUsers({ dispatch, commit }, search_term) {
+        return ApiService.get('course/' + state.cid + '/searchuser/' + search_term)
+        .then(({ data }) => {
+            commit('setSearchUsers', data.users);
+        });
     }
 }
 
@@ -192,6 +218,20 @@ const mutations = {
     setInfotext(state, infotext) {
         state.infotext = infotext;
     },
+
+    setTemplates(state, templates) {
+        let new_templates = {};
+
+        for (let template of templates) {
+            new_templates[template.id] = template.attributes;
+        }
+
+        state.templates = new_templates;
+    },
+
+    setSearchUsers(state, search_users) {
+        state.search_users = search_users;
+    }
 }
 
 

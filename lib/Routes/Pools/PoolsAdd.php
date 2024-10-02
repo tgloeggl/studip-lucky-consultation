@@ -16,8 +16,6 @@ class PoolsAdd extends LuckyConsultationController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        global $user;
-
         $json = $this->getRequestData($request);
 
         $pool = new Pools;

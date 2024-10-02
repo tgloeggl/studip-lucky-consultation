@@ -1,21 +1,21 @@
 <template>
     <v-select ref="select"
-        @change="updateValue"
+        @input="updateValue"
         v-bind="{...$props, ...$attrs}"
         :calculate-position="withPopper"
         class="studip-v-select"
         append-to-body
     >
-        <template v-for="(index, name) in $scopedSlots" v-slot:[name]="data">
+        <template v-for="(index, name) in $slots" v-slot:[name]="data">
             <slot :name="name" v-bind="data"></slot>
         </template>
     </v-select>
 </template>
 
 <script>
-import vSelect from 'vue-select';
+import vSelect from 'vue3-select';
 import { createPopper } from '@popperjs/core'
-import 'vue-select/dist/vue-select.css'
+import 'vue3-select/dist/vue3-select.css'
 export default {
     name: 'studip-select',
     inheritAttrs: false,
@@ -43,7 +43,7 @@ export default {
                 parseFloat(this.getStyleValue(dropdownList, 'paddingTop')) +
                 parseFloat(this.getStyleValue(dropdownList, 'paddingBottom'));
             const popper = createPopper(component.$refs.toggle, dropdownList, {
-                placement: this.calculatePlacement(dropdownListHeight),
+                //placement: this.calculatePlacement(dropdownListHeight), TODO this is broken
                 modifiers: [
                     {
                         name: 'offset',
@@ -83,7 +83,14 @@ export default {
                 document.documentElement.scrollHeight,
                 document.documentElement.offsetHeight
             );
-            let footerHeight = document.getElementById('layout_footer').offsetHeight;
+            let footerHeight = 0;
+            if (window.OpencastPlugin.STUDIP_VERSION >= 5.3) {
+                footerHeight = document.getElementById('main-footer').offsetHeight;
+            }
+            else {
+                footerHeight = document.getElementById('layout_footer').offsetHeight;
+            }
+
             let functionalAreaHeight = totalDocHeight - footerHeight;
             return totalExpandedList >= functionalAreaHeight ? 'top' : 'bottom';
         },

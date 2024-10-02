@@ -45,4 +45,13 @@ class Dates extends UPMap
             return $this->user->username;
         }
     }
+
+    public function toArray($only_these_fields = null)
+    {
+        $data = parent::toArray($only_these_fields);
+
+        $data['waitinglist'] = $this->waitinglist->toArray();
+
+        return $data;
+    }
 }

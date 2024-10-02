@@ -20,17 +20,32 @@ class DatesEdit extends LuckyConsultationController
 
         $json = $this->getRequestData($request);
 
-        $date = Dates::find($json['id']);
+        foreach ($json['dates'] as $json_date) {
+            $date = Dates::find($json_date['id']);
 
-        if (!empty($date) && $date->course_id == $args['course_id']) {
-            $date->setData([
-                'description' => $json['description'],
-                'start'       => $json['start'],
-                'pool'        => $json['pool']
-            ]);
-            $date->store();
-        } else {
-            throw new Error('Access Denied', 403);
+            if (empty($date)) {
+                $date = new Dates();
+                $date->course_id = $args['course_id'];
+            }
+
+            if (!empty($date) && $date->course_id == $args['course_id']) {
+                unset($json_date['attributes']['id']);
+                unset($json_date['attributes']['course_id']);
+
+                $date->setData($json_date['attributes']);
+                $date->store();
+            } else {
+                throw new Error('Access Denied', 403);
+            }
+        }
+
+        // delete dates (id any)
+        foreach ($json['delete'] as $date_id) {
+            $date = Dates::find($date_id);
+
+            if ($date->course_id == $args['course_id']) {
+                $date->delete();
+            }
         }
 
         $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);

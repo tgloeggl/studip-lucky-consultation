@@ -1,6 +1,6 @@
 <?php
 
-namespace LuckyConsultation\Routes\Pools;
+namespace LuckyConsultation\Routes\Templates;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -8,16 +8,16 @@ use LuckyConsultation\Errors\AuthorizationFailedException;
 use LuckyConsultation\Errors\Error;
 use LuckyConsultation\LuckyConsultationTrait;
 use LuckyConsultation\LuckyConsultationController;
-use LuckyConsultation\Models\Pools;
+use LuckyConsultation\Models\Templates;
 
-class PoolsList extends LuckyConsultationController
+class TemplatesList extends LuckyConsultationController
 {
     use LuckyConsultationTrait;
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $pools = Pools::findByCourse_id($args['course_id']);
+        $templates = Templates::findBySql(1);
 
-        return $this->createResponse($this->toArray($pools), $response);
+        return $this->createResponse($this->toArray($templates), $response);
     }
 }

@@ -141,13 +141,21 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
 
         if ($GLOBALS['perm']->have_studip_perm('tutor', $course_id)) {
             $main->setURL(PluginEngine::getURL($this, [], 'course/index/#/editor'));
+
+            $index = new Navigation($this->_('Sprechstunden'));
+            $index->setURL(PluginEngine::getURL($this, [], 'course/index/#/editor'));
+            $main->addSubNavigation('index', $index);
+
+            $templates = new Navigation($this->_('Vorlagen'));
+            $templates->setURL(PluginEngine::getURL($this, [], 'course/index/#/templates'));
+            $main->addSubNavigation('templates', $templates);
         } else {
             $main->setURL(PluginEngine::getURL($this, [], 'course/index'));
-        }
 
-        $index = new Navigation($this->_('Sprechstunden'));
-        $index->setURL(PluginEngine::getURL($this, [], 'course/index/#/editor'));
-        $main->addSubNavigation('index', $index);
+            $index = new Navigation($this->_('Sprechstunden'));
+            $index->setURL(PluginEngine::getURL($this, [], 'course/index'));
+            $main->addSubNavigation('index', $index);
+        }
 
         return array('luckyconsulation' => $main);
     }
@@ -223,7 +231,8 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
             return true;
         }
 
-        return false;
+        // return false;
+        return true;
     }
 
     /**

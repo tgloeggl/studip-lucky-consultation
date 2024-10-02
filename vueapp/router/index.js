@@ -14,6 +14,12 @@ export default createRouter({
             path: "/editor",
             name: "editor",
             component: () => import("@/views/SprechstundenEditor")
+        },
+
+        {
+            path: "/templates",
+            name: "templates",
+            component: () => import("@/views/SprechstundenTemplates")
         }
     ]
 });

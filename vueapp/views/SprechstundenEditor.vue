@@ -24,6 +24,9 @@
                             Losen am
                         </th>
                         <th>
+                            Mailvorlage
+                        </th>
+                        <th>
                             Aktionen
                         </th>
                     </tr>
@@ -60,6 +63,20 @@
                                 <span v-if="pool.attributes.lots_drawn == 1">
                                     (wurde gelost)
                                 </span>
+                            </span>
+                        </td>
+                        <td>
+                            <span v-if="currentPool.id == pool.id">
+                                <select
+                                    v-model="currentPool.template"
+                                >
+                                    <option value="PP">PP</option>
+                                    <option value="KJP">KJP</option>
+                                </select>
+                            </span>
+
+                            <span v-else>
+                                {{  pool.attributes.template }}
                             </span>
                         </td>
                         <td class="actions">
@@ -119,21 +136,44 @@
 
         <div v-if="pools && pools.length">
             <h1>Vorhandene Termine und Auslastung</h1>
-            <studip-button icon="add" @click="cancelDateEdit();addDate = true">
+            <studip-button icon="add" @click="addDate()">
                 Neuer Sprechstundentermin
             </studip-button>
 
-             <table class="default" v-if="addDate || (dates && dates.length) ">
+            <span v-if="editMode">
+                <studip-button icon="accept" @click.stop="storeDates">
+                    Alles speichern
+                </studip-button>
+
+                <studip-button icon="cancel" @click.stop="cancelEdit">
+                    Abbrechen
+                </studip-button>
+            </span>
+
+            <span v-else>
+                <studip-button icon="edit" @click.stop="editMode = true">
+                    Alles bearbeiten
+                </studip-button>
+            </span>
+
+             <table class="default" v-if="(datelist && datelist.length) ">
                 <colgroup>
+                    <col v-if="editMode" width="1%">
                     <col width="25%">
-                    <col width="25%">
+                    <col width="15%">
                     <col width="5%">
-                    <col width="20%">
-                    <col width="5%">
+                    <col width="8%">
+                    <col width="8%">
+                    <col width="8%">
+                    <col width="9%">
+                    <col width="8%">
+                    <col v-if="!editMode" width="20%">
+                    <col v-if="!editMode" width="5%">
                     <col width="20%">
                 </colgroup>
                 <thead>
                     <tr>
+                        <th v-if="editMode"></th>
                         <th>
                             Beschreibung
                         </th>
@@ -144,9 +184,34 @@
                             Lospool
                         </th>
                         <th>
-                            Zugeordnete Person
+                            <abbr title="Fallseminar Startdaum">
+                                FS Start
+                            </abbr>
                         </th>
                         <th>
+                            <abbr title="Fallseminar Zeitfenster / Uhrzeit">
+                                FS Slot
+                            </abbr>
+                        </th>
+                        <th>
+                            <abbr title="Fallseminar Zeitfenster">
+                                FS Raum
+                            </abbr>
+                        </th>
+                        <th>
+                            <abbr title="Kick-Off-Sitzung Datum und Uhrzeit">
+                                KO Datum
+                            </abbr>
+                        </th>
+                        <th>
+                            <abbr title="Kick-Off-Sitzung Raum">
+                                KO Raum
+                            </abbr>
+                        </th>
+                        <th v-if="!editMode">
+                            Zugeordnete Person
+                        </th>
+                        <th v-if="!editMode">
                             Losliste
                         </th>
                         <th>
@@ -155,30 +220,37 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="date in dates" :key="date.id">
+                    <tr v-for="date in datelist" :key="date.id">
+                        <td v-if="editMode">
+                            <a href="#" @click.prevent="removeDateFromList(date.id)">
+                                <studip-icon shape="trash"/>
+                            </a>
+                        </td>
+
                         <td>
-                            <span v-if="currentDate.id == date.id">
-                                <input :class="{
-                                        invalid: !dateValidation.description
-                                    }"
-                                    type="text"
-                                    placeholder="Therapeut/in"
-                                    v-model="currentDate.description"
-                                >
+                            <span v-if="editMode">
+                                <therapist-search
+                                    :class="{ invalid: dateValidation.description == date.id }"
+                                    :value="date.id ? date.attributes.description : ''"
+                                    :dateId="date.id"
+                                    @date-input="setDateDescription"
+                                    :placeholder="$gettext('Therapeut/in')">
+                                </therapist-search>
                             </span>
 
                             <span v-else>
+                                <studip-icon v-if="date.attributes.therapist_id" shape="person"></studip-icon>
                                 {{ date.attributes.description }}
                             </span>
                         </td>
 
                         <td>
-                            <span v-if="currentDate.id == date.id">
+                            <span v-if="editMode">
                                 <input :class="{
-                                        invalid: !dateValidation.start
+                                        invalid: dateValidation.start == date.id
                                     }"
                                     type="datetime-local"
-                                    v-model="currentDate.start"
+                                    v-model="date.attributes.start"
                                 >
                             </span>
 
@@ -188,12 +260,12 @@
                         </td>
 
                          <td>
-                            <span v-if="currentDate.id == date.id">
+                            <span v-if="editMode">
                                 <select
                                     :class="{
-                                        invalid: !dateValidation.pool
+                                        invalid: dateValidation.pool == date.id
                                     }"
-                                    v-model="currentDate.pool"
+                                    v-model="date.attributes.pool"
                                 >
                                     <option v-for="pool in pools" :key="pool.id" :value="pool.id">
                                         {{ pool.attributes.name }}
@@ -207,6 +279,56 @@
                         </td>
 
                         <td>
+                            <template v-if="!editMode">
+                                {{ date.attributes.fs_start }}
+                            </template>
+
+                            <input v-else type="text"
+                                v-model="date.attributes.fs_start"
+                            >
+                        </td>
+
+                        <td>
+                            <template v-if="!editMode">
+                                {{ date.attributes.fs_slot }}
+                            </template>
+
+                            <input v-else type="text"
+                                v-model="date.attributes.fs_slot"
+                            >
+                        </td>
+
+                        <td>
+                            <template v-if="!editMode">
+                                {{ date.attributes.fs_room }}
+                            </template>
+
+                            <input v-else type="text"
+                                v-model="date.attributes.fs_room"
+                            >
+                        </td>
+
+                        <td>
+                            <template v-if="!editMode">
+                                {{ date.attributes.ko_date }}
+                            </template>
+
+                            <input v-else type="text"
+                                v-model="date.attributes.ko_date"
+                            >
+                        </td>
+
+                        <td>
+                            <template v-if="!editMode">
+                                {{ date.attributes.ko_room }}
+                            </template>
+
+                            <input v-else type="text"
+                                v-model="date.attributes.ko_room"
+                            >
+                        </td>
+
+                        <td v-if="!editMode">
                             <a target="_blank" :href="getUserLink(date.attributes.username)">
                                 {{ date.attributes.fullname }}
                             </a>
@@ -215,73 +337,36 @@
                             </a>
                         </td>
 
-                        <td>
+                        <td v-if="!editMode">
                             {{ date.attributes.waiting }}
+
+                            <div data-tooltip class="tooltip" v-if="date.attributes.waiting">
+                                <span class="tooltip-content" style="display: none">
+                                    <template v-for="user in date.attributes.waitinglist">
+                                        {{ user.fullname }} <br/>
+                                    </template>
+                                </span>
+
+                                <studip-icon shape="info" role="clickable" :size="16"/>
+                            </div>
                         </td>
 
                         <td class="actions">
-                            <span v-if="currentDate.id == date.id">
-                                <studip-button icon="accept" @click="storeDate">
-                                    Speichern
-                                </studip-button>
-
-                                <studip-button icon="cancel" @click="cancelDateEdit">
-                                    Abbrechen
+                            <span v-if="editMode">
+                                <studip-button icon="accept" @click="storeDates">
+                                    Alles speichern
                                 </studip-button>
                             </span>
 
                             <span v-else>
-                                <a href="#" @click.prevent="editDate(date)">
-                                    <studip-icon shape="edit"/> Bearbeiten
+                                <a href="#" @click.prevent="editMode = true">
+                                    <studip-icon shape="edit"/> Alles bearbeiten
                                 </a>
 
                                 <a href="#" @click.prevent="deleteDate(date)">
                                     <studip-icon shape="trash"/> Löschen
                                 </a>
                             </span>
-                        </td>
-                    </tr>
-
-                    <tr v-if="addDate && !currentDate.id">
-                        <td>
-                            <input :class="{
-                                    invalid: !dateValidation.description
-                                }"
-                                type="text"
-                                placeholder="Therapeut/in"
-                                v-model="currentDate.description"
-                            >
-                        </td>
-                        <td>
-                            <input :class="{
-                                    invalid: !dateValidation.start
-                                }"
-                                type="datetime-local"
-                                v-model="currentDate.start"
-                            >
-                        </td>
-
-                        <td>
-                            <select
-                                :class="{
-                                    invalid: !dateValidation.pool
-                                }"
-                                v-model="currentDate.pool"
-                            >
-                                <option v-for="pool in pools" :key="pool.id" :value="pool.id">
-                                    {{ pool.attributes.name }}
-                                </option>
-                            </select>
-                        </td>
-
-                        <td class="actions" colspan="3">
-                            <studip-button icon="accept" @click="storeDate">
-                                Speichern
-                            </studip-button>
-
-                            <studip-button icon="cancel" @click="cancelDateEdit">
-                                Abbrechen
-                            </studip-button>
                         </td>
                     </tr>
                 </tbody>
@@ -296,13 +381,19 @@ import { mapGetters } from "vuex";
 
 import StudipButton from '@/components/Studip/StudipButton';
 import StudipIcon from '@/components/Studip/StudipIcon';
+import StudipSelect from '@/components/Studip/StudipSelect';
 import InfoField from '@/components/InfoField';
+import TherapistSearch from '@/components/TherapistSearch'
 
 export default {
-    name: "Sprechstunden",
+    name: "SprechstundenEditor",
 
     components: {
-        StudipButton,   StudipIcon,     InfoField
+        StudipButton,
+        StudipIcon,
+        StudipSelect,
+        InfoField,
+        TherapistSearch
     },
 
     data() {
@@ -310,14 +401,14 @@ export default {
             addPool: false,
             currentPool: {
                 name: '',
-                date: null
+                date: null,
+                template: ''
             },
             poolValidation: {
                 name: true,
                 date: true
             },
 
-            addDate: false,
             currentDate: {
                 description: '',
                 start      : null,
@@ -327,12 +418,15 @@ export default {
                 description: true,
                 start      : true,
                 pool       : true
-            }
+            },
+            editMode: false,
+            datelist: [],
+            deleteDates: []
         }
     },
 
     computed: {
-        ...mapGetters(['cid', 'pools', 'dates'])
+        ...mapGetters(['cid', 'pools', 'dates', 'search_users']),
     },
 
     methods: {
@@ -381,6 +475,7 @@ export default {
                 id  : pool.id,
                 name: pool.attributes.name,
                 date: pool.attributes.date,
+                template: pool.attributes.template
             }
         },
 
@@ -403,50 +498,58 @@ export default {
             return '-';
         },
 
-        storeDate() {
-            this.dateValidation = {
-                description: true,
-                start      : true,
-                pool       : true
+        setDateDescription(returnValue, date_id) {
+            for (let id in this.datelist) {
+                if (this.datelist[id].id == date_id) {
+                    this.datelist[id].attributes.description  = returnValue.name;
+                    this.datelist[id].attributes.therapist_id = returnValue.value;
+                    return;
+                }
             }
+        },
 
+        storeDates()
+        {
             let validated = true;
 
-            if (this.currentDate.description.length == 0) {
-                this.dateValidation.description = false;
-                validated = false;
+            for (let date of this.datelist) {
+
+                if (date.attributes.description.length == 0) {
+                    this.dateValidation.description = date.id;
+                    validated = false;
+                }
+
+                if (date.attributes.start == null) {
+                    this.dateValidation.start = date.id;
+                    validated = false;
+                }
+
+                if (!date.attributes.pool) {
+                    this.dateValidation.pool = date.id;
+                    validated = false;
+                }
+
+                if (!validated) {
+                    return;
+                }
             }
 
-            if (this.currentDate.start == null) {
-                this.dateValidation.start = false;
-                validated = false;
-            }
-
-            if (!this.currentDate.pool) {
-                this.dateValidation.pool = false;
-                validated = false;
-            }
-
-            if (!validated) {
-                return;
-            }
-
-            let promise;
-
-            if (this.currentDate.id) {
-                promise = this.$store.dispatch('editDate', this.currentDate);
-            } else {
-                promise = this.$store.dispatch('addDate', this.currentDate);
-            }
-
-            promise.then(() => {
-                this.cancelDateEdit();
-            })
+            this.$store.dispatch('editDates', {
+                'dates': this.datelist,
+                'delete': this.deleteDates
+            }).then(() => {
+                this.datelist = JSON.parse(JSON.stringify(this.dates));
+                this.deleteDates = [];
+                this.editMode = false;
+            });
         },
 
         deleteDate(date) {
             if (confirm('Sind sie sicher, dass sie den Zeiteintrag "' + date.attributes.description + '" löschen möchten?')) {
-                this.$store.dispatch('deleteDate', date.id);
+                this.$store.dispatch('deleteDate', date.id)
+                    .then(() => {
+                        this.datelist = JSON.parse(JSON.stringify(this.dates));
+                    });
             }
         },
 
@@ -456,23 +559,54 @@ export default {
             }
         },
 
-        editDate(date) {
-            this.currentDate = {
-                id         : date.id,
-                description: date.attributes.description,
-                start      : date.attributes.start,
-                pool       : date.attributes.pool,
+        addDate()
+        {
+            let new_date = {
+                attributes: {
+                    description: '',
+                    start      : null,
+                    pool       : null
+                }
             }
+            // get last entry in array, if any
+            if (this.datelist && this.datelist.length) {
+                new_date = JSON.parse(JSON.stringify(
+                    this.datelist[this.datelist.length - 1]
+                ));
+                delete new_date.id
+                delete new_date.attributes.id;
+                delete new_date.attributes.start
+            } else {
+                this.datelist = [];
+            }
+
+            this.datelist.push(new_date);
+            this.editMode = true;
         },
 
-        cancelDateEdit() {
-            this.currentDate = {
-                description: '',
-                start      : null,
-                pool       : null
+        cancelEdit()
+        {
+            this.datelist = JSON.parse(JSON.stringify(this.dates));
+            this.editMode = false;
+        },
+
+        removeDateFromList(date_id)
+        {
+            let found = -1;
+
+            for (let i = 0; i < this.datelist.length; i++) {
+                if (this.datelist[i].id == date_id) {
+                    found = i;
+                }
             }
 
-            this.addDate = false;
+            if (this.datelist[found].id) {
+                this.deleteDates.push(this.datelist[found].id);
+            }
+
+            if (found > -1) {
+                this.datelist.splice(found, 1);
+            }
         },
 
         getUserLink(username) {
@@ -483,7 +617,10 @@ export default {
     mounted() {
         this.$store.dispatch('loadCurrentUser');
         this.$store.dispatch('loadPools');
-        this.$store.dispatch('loadDates');
+        this.$store.dispatch('loadDates')
+            .then(() => {
+                this.datelist = JSON.parse(JSON.stringify(this.dates));
+            });
     },
 
     beforeRouteEnter (to, from) {

@@ -16,8 +16,6 @@ class PoolsDelete extends LuckyConsultationController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        global $user;
-
         $pool = Pools::find($args['pool_id']);
 
         if ($pool->course_id == $args['course_id']) {

@@ -56,12 +56,15 @@ class RouteMap
         $group->put('/course/{course_id}/pools', Routes\Pools\PoolsEdit::class);
         $group->delete('/course/{course_id}/pools/{pool_id}', Routes\Pools\PoolsDelete::class);
 
-
-        $group->post('/course/{course_id}/dates', Routes\Dates\DatesAdd::class);
-        $group->put('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
+        $group->post('/course/{course_id}/dates', Routes\Dates\DatesEdit::class);
         $group->delete('/course/{course_id}/dates/{date_id}', Routes\Dates\DatesDelete::class);
         $group->delete('/course/{course_id}/dates/{date_id}/user', Routes\Dates\DatesDeleteUser::class);
 
         $group->put('/course/{course_id}/infotext', Routes\Infotext\InfotextEdit::class);
+
+        $group->get('/templates/{course_id}', Routes\Templates\TemplatesList::class);
+        $group->post('/templates/{course_id}', Routes\Templates\TemplatesEdit::class);
+
+        $group->get('/course/{course_id}/searchuser/{term}', Routes\Users\UsersSearch::class);
     }
 }

@@ -16,8 +16,6 @@ class PoolsEdit extends LuckyConsultationController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        global $user;
-
         $json = $this->getRequestData($request);
 
         $pool = Pools::find($json['id']);
@@ -28,8 +26,9 @@ class PoolsEdit extends LuckyConsultationController
             }
 
             $pool->setData([
-                'name' => $json['name'],
-                'date' => $json['date']
+                'name'      => $json['name'],
+                'date'      => $json['date'],
+                'template'  => $json['template']
             ]);
             $pool->store();
         } else {

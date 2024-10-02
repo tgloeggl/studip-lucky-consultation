@@ -62,6 +62,38 @@ class DrawLots extends CronJob
                     // clear waitinglist for this date
                     $date->waitinglist = [];
                     WaitingList::deleteByDates_id($date->id);
+
+
+                    // send success mail to winner
+                    $messaging = new Messaging();
+
+                    $template = $pool->templates->template;
+
+                    $replacements = [
+                        '##fullname##'      => get_fullname($winner['user_id']),
+                        '##therapist##'     => $date->description,
+                        '##date##'          => date('d.m.Y', strtotime($date->start)),
+                        '##time##'          => date('H:i', strtotime($date->start)),
+                        '##weekday##'       => date('l', strtotime($date->start)),
+                        '##fs_start##'      => $date->fs_start,
+                        '##fs_slot##'       => $date->fs_slot,
+                        '##fs_room##'       => $date->fs_room,
+                        '##ko_date##'       => $date->ko_date,
+                        '##ko_room##'       => $date->ko_room,
+                    ];
+
+                    foreach ($replacements as $key => $text) {
+                        $template = str_replace($key, $text, $template);
+                    }
+
+                    $messaging->insert_message($template,
+                        get_username($winner['user_id']), '____%system%____',
+                        false, false, false, false,
+                        sprintf(
+                            _('Ihnen wurde ein Termin am %s bei %s zugelost!'),
+                            $date->start, $date->description
+                        )
+                    );
                 }
             }
 

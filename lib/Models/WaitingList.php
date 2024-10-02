@@ -21,4 +21,13 @@ class WaitingList extends UPMap
             'user_id'   => $user_id
         ]);
     }
+
+    public function toArray($only_these_fields = null)
+    {
+        $data = parent::toArray($only_these_fields);
+
+        $data['fullname'] = \get_fullname($this->user_id);
+
+        return $data;
+    }
 }

@@ -21,8 +21,6 @@ class Perm
         //get permission level for editing episodes
         $requiredPerm = \Config::get()->LuckyConsultation_TUTOR_EPISODE_PERM ? 'tutor' : 'dozent';
 
-        // TODO: allow authors editing their own videos as well
-
         return $GLOBALS['perm']->have_studip_perm($requiredPerm, $context_id, $user_id);
     }
 

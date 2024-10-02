@@ -192,6 +192,14 @@ export default {
         this.$store.dispatch('loadMyDates');
         this.$store.dispatch('loadWaitingList');
         this.$store.dispatch('loadInfotext');
+    },
+
+    beforeRouteEnter (to, from) {
+        if (window.LuckyConsultationPlugin.PERMS) {
+            return '/editor';
+        }
+
+        return true;
     }
 };
 </script>
