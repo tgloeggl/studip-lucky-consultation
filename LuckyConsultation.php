@@ -231,8 +231,7 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
             return true;
         }
 
-        // return false;
-        return true;
+        return false;
     }
 
     /**
