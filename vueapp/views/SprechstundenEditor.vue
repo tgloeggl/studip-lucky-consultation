@@ -231,7 +231,7 @@
                             <span v-if="editMode">
                                 <therapist-search
                                     :class="{ invalid: dateValidation.description == date.id }"
-                                    :value="date.id ? date.attributes.description : ''"
+                                    :value="date.attributes.therapist_id ? date.attributes.description : ''"
                                     :dateId="date.id"
                                     @date-input="setDateDescription"
                                     :placeholder="$gettext('Therapeut/in')">
@@ -500,7 +500,7 @@ export default {
 
         setDateDescription(returnValue, date_id) {
             for (let id in this.datelist) {
-                if (this.datelist[id].id == date_id) {
+                if (this.datelist[id].id == date_id || id == date_id) {
                     this.datelist[id].attributes.description  = returnValue.name;
                     this.datelist[id].attributes.therapist_id = returnValue.value;
                     return;
