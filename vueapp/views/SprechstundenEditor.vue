@@ -555,7 +555,10 @@ export default {
 
         deleteUserFromDate(date) {
             if (confirm('Sind sie sicher, dass sie den/die Nutzer/in "' + date.attributes.fullname + '" aus dem Zeiteintrag "' + date.attributes.description + '" löschen möchten?')) {
-                this.$store.dispatch('deleteUserFromDate', date.id);
+                this.$store.dispatch('deleteUserFromDate', date.id)
+                    .then(() => {
+                        this.datelist = JSON.parse(JSON.stringify(this.dates));
+                    });
             }
         },
 

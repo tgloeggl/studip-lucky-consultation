@@ -1,9 +1,11 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once 'lib/messaging.inc.php';
 
 use LuckyConsultation\Models\Dates;
 use LuckyConsultation\Models\Pools;
 use LuckyConsultation\Models\WaitingList;
+use LuckyConsultation\Models\Templates;
 
 class DrawLots extends CronJob
 {
@@ -22,6 +24,11 @@ class DrawLots extends CronJob
     {
         // get all pools to dra lots for
         $pools = Pools::findBySQL('lots_drawn = 0 AND date <= NOW()');
+
+        $templates = [];
+        foreach(Templates::findBySQL(1) as $t) {
+            $templates[$t->id] = $t->template;
+        }
 
         foreach ($pools as $pool) {
             // get dates and draw lots
@@ -63,11 +70,10 @@ class DrawLots extends CronJob
                     $date->waitinglist = [];
                     WaitingList::deleteByDates_id($date->id);
 
-
                     // send success mail to winner
-                    $messaging = new Messaging();
+                    $messaging = new \Messaging();
 
-                    $template = $pool->templates->template;
+                    $template = $templates[$pool->template];
 
                     $replacements = [
                         '##fullname##'      => get_fullname($winner['user_id']),
@@ -92,6 +98,15 @@ class DrawLots extends CronJob
                         sprintf(
                             _('Ihnen wurde ein Termin am %s bei %s zugelost!'),
                             $date->start, $date->description
+                        )
+                    );
+
+                    $messaging->insert_message($template,
+                        get_username($date['therapist_id']), '____%system%____',
+                        false, false, false, false,
+                        sprintf(
+                            _('%s wurde ein Termin am %s bei Ihnen zugelost!'),
+                            get_fullname($winner['user_id']), $date->start
                         )
                     );
                 }
