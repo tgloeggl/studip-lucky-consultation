@@ -220,7 +220,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="date in datelist" :key="date.id">
+                    <tr v-for="(date, num) in datelist" :key="date.id">
                         <td v-if="editMode">
                             <a href="#" @click.prevent="removeDateFromList(date.id)">
                                 <studip-icon shape="trash"/>
@@ -231,8 +231,8 @@
                             <span v-if="editMode">
                                 <therapist-search
                                     :class="{ invalid: dateValidation.description == date.id }"
-                                    :value="date.attributes.therapist_id ? date.attributes.description : ''"
-                                    :dateId="date.id"
+                                    :value="date.attributes.description"
+                                    :dateId="num"
                                     @date-input="setDateDescription"
                                     :placeholder="$gettext('Therapeut/in')">
                                 </therapist-search>
@@ -500,7 +500,7 @@ export default {
 
         setDateDescription(returnValue, date_id) {
             for (let id in this.datelist) {
-                if (this.datelist[id].id == date_id || id == date_id) {
+                if (id == date_id) {
                     this.datelist[id].attributes.description  = returnValue.name;
                     this.datelist[id].attributes.therapist_id = returnValue.value;
                     return;
@@ -571,11 +571,24 @@ export default {
                     pool       : null
                 }
             }
+
             // get last entry in array, if any
             if (this.datelist && this.datelist.length) {
-                new_date = JSON.parse(JSON.stringify(
-                    this.datelist[this.datelist.length - 1]
-                ));
+                // get date to copy
+
+                let latest = new Date("2000-01-01");
+                let use_date = null;
+                for (let id in this.datelist) {
+                    let d1 = new Date(this.datelist[id].attributes.chdate);
+
+                    if (d1 > latest) {
+                        latest = d1;
+                        use_date = JSON.stringify(this.datelist[id]);
+                    }
+                }
+
+                new_date = JSON.parse(use_date);
+
                 delete new_date.id
                 delete new_date.attributes.id;
                 delete new_date.attributes.start
