@@ -371,6 +371,10 @@
                     </tr>
                 </tbody>
             </table>
+
+            <studip-button icon="add" @click="addDate()">
+                Neuer Sprechstundentermin
+            </studip-button>
         </div>
         </form>
     </div>
