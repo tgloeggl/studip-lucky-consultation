@@ -18,7 +18,9 @@ class Dates extends UPMap
             'assoc_foreign_key' => 'dates_id'
         ];
 
-        //$config['additional_fields']['username']['get'] = 'getUsername';
+        $config['serialized_fields'] = [
+            'history' => \JSONArrayObject::class,
+        ];
 
         $config['additional_fields']['username']['get'] = 'getUsername';
         $config['additional_fields']['fullname']['get'] = 'getFullname';

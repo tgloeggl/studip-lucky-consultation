@@ -33,6 +33,27 @@ class DrawLots extends CronJob
             $templates[$t->id] = $t->template;
         }
 
+        // fixate all waiting list for later reference
+        foreach ($pools as $pool) {
+            foreach ($pool->dates as $date) {
+                $list = $date->waitinglist->toArray();
+
+                if (!empty($list)) {
+                    $waitinglist = [];
+
+                    foreach ($list as $entry) {
+                        $waitinglist[] = get_fullname($entry['user_id']) . ' ('. get_username($entry['user_id']) .')';
+                    }
+
+                    $history = $date->history;
+                    $history[date('H:i:s_d.m.Y')] = $waitinglist;
+                    $date->history = $history;
+
+                    $date->store();
+                }
+            }
+        }
+
         foreach ($pools as $pool) {
             // get dates and draw lots
             foreach ($pool->dates as $date) {
