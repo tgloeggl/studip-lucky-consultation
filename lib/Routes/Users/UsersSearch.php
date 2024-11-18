@@ -18,11 +18,22 @@ class UsersSearch extends LuckyConsultationController
         global $user;
 
         $search_term = $args['term'];
+        $course_id   = $args['course_id'];
 
-        // get all institutes for the faculty
-        // 9ae3b681c2e2b51c20fd3b31756a5dd4	- Institut für Psychologie
+        // get all institutes for the faculty of the current course
+        $course = \Course::find($course_id);
+
+        // Fallback - 9ae3b681c2e2b51c20fd3b31756a5dd4	- Institut für Psychologie
+        $institute_id = '9ae3b681c2e2b51c20fd3b31756a5dd4';
+
+        if ($course) {
+            $institute_id = $course->home_institut->id;
+        }
+
         $institute = \DBManager::get()->query("SELECT Institut_id FROM Institute
-            WHERE fakultaets_id = '9ae3b681c2e2b51c20fd3b31756a5dd4'")->fetchAll(\PDO::FETCH_COLUMN);
+            WHERE fakultaets_id = '$institute_id'
+                OR Institut_id = '$institute_id'"
+        )->fetchAll(\PDO::FETCH_COLUMN);
 
         $data = [
             ':input' => "%" . $search_term . "%",
