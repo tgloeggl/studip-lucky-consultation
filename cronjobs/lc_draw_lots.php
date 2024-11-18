@@ -22,6 +22,9 @@ class DrawLots extends CronJob
 
     public function execute($last_result, $parameters = array())
     {
+        // set to default system language
+        setTempLanguage();
+
         // get all pools to dra lots for
         $pools = Pools::findBySQL('lots_drawn = 0 AND date <= NOW()');
 
@@ -80,7 +83,7 @@ class DrawLots extends CronJob
                         '##therapist##'     => $date->description,
                         '##date##'          => date('d.m.Y', strtotime($date->start)),
                         '##time##'          => date('H:i', strtotime($date->start)),
-                        '##weekday##'       => date('l', strtotime($date->start)),
+                        '##weekday##'       => strftime('%A', strtotime($date->start)),
                         '##fs_start##'      => $date->fs_start,
                         '##fs_slot##'       => $date->fs_slot,
                         '##fs_room##'       => $date->fs_room,
