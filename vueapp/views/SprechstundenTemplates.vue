@@ -1,5 +1,6 @@
 <template>
     <div>
+        <MessageList :messages="messages" @remove="removeMessage"/>
         <form class="default" @submit.prevent>
             <fieldset>
                 <legend>
@@ -51,6 +52,7 @@
             </footer>
         </form>
 
+        <MessageList :messages="messages" @remove="removeMessage"/>
         <br>
 
         <table class="default">
@@ -91,12 +93,14 @@ import { mapGetters } from "vuex";
 
 import StudipButton from '@/components/Studip/StudipButton';
 import StudipIcon from '@/components/Studip/StudipIcon';
+import MessageList from '@/components/MessageList';
 
 export default {
     name: "SprechstundenTemplates",
 
     components: {
-        StudipButton,   StudipIcon
+        StudipButton,   StudipIcon,
+        MessageList
     },
 
     data()
@@ -143,7 +147,9 @@ export default {
                     name: '##ko_room##',
                     description: 'Raum des Kick-Off-Termins'
                 }
-            ]
+            ],
+            messages: [],
+            message_num: 0
         };
     },
 
@@ -169,7 +175,23 @@ export default {
 
     methods: {
         storeTemplates() {
-            this.$store.dispatch('storeTemplates', this.templates);
+            let view = this;
+
+            this.$store.dispatch('storeTemplates', this.templates).then(() => {
+                view.messages.push({
+                    'id'  : this.message_num++,
+                    'type': 'success',
+                    'text': 'Mailvorlagen wurden gespeichert!'
+                });
+            });
+        },
+
+        removeMessage(id) {
+            for (let msg_id in this.messages) {
+                if (this.messages[msg_id].id == id) {
+                    this.messages.splice(msg_id, 1);
+                }
+            }
         },
 
         replaceTemplateWithSamples(template)

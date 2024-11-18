@@ -16,17 +16,20 @@ import MessageBox from '@/components/MessageBox';
 export default {
     name: 'MessageList',
 
+    props: ['messages'],
+
     components: {
         MessageBox
     },
 
-    computed: {
-        ...mapGetters(['messages'])
-    },
+    // computed: {
+    //     ...mapGetters(['messages'])
+    // },
 
     methods: {
         removeMessage(id) {
-            this.$store.commit('removeMessage', id);
+            this.$emit('remove', id);
+            // this.$store.commit('removeMessage', id);
         }
     }
 }
