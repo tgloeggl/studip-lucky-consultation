@@ -169,6 +169,7 @@
                     <col width="8%">
                     <col v-if="!editMode" width="20%">
                     <col v-if="!editMode" width="5%">
+                    <col v-if="!editMode" width="5%">
                     <col width="20%">
                 </colgroup>
                 <thead>
@@ -213,6 +214,9 @@
                         </th>
                         <th v-if="!editMode">
                             Losliste
+                        </th>
+                        <th v-if="!editMode">
+                            Historie
                         </th>
                         <th>
                             Aktionen
@@ -348,6 +352,24 @@
                                 </span>
 
                                 <studip-icon shape="info" role="clickable" :size="16"/>
+                            </div>
+                        </td>
+
+                        <td v-if="!editMode">
+                            <div data-tooltip class="tooltip" v-if="date.attributes.history">
+                                <span class="tooltip-content" style="display: none">
+                                    <template v-for="(entries, date) in date.attributes.history">
+                                        Loszeitpunkt: <br/>
+                                        {{ date }} <br/>
+                                        Personen auf der Losliste: <br/>
+                                        <template v-for="(entry) in entries">
+                                            {{ entry }}
+                                        </template>
+                                        <hr>
+                                    </template>
+                                </span>
+
+                                <studip-icon shape="list" role="clickable" :size="16"/>
                             </div>
                         </td>
 
