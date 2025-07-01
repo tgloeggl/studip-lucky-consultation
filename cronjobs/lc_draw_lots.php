@@ -20,6 +20,26 @@ class DrawLots extends CronJob
         return _('Losbasierte Sprechstunden: Lost fällige Losungen aus.');
     }
 
+    /**
+     * Executes the draw lots process for lucky consultations.
+     *
+     * This method performs the following tasks:
+     * 1. Sets the default system language.
+     * 2. Retrieves all pools that need to have lots drawn.
+     * 3. Loads all templates.
+     * 4. Fixates all waiting lists for later reference.
+     * 5. Sorts pools by date (earliest first).
+     * 6. For each pool, sorts dates by number of waitlist entries (fewest first).
+     * 7. For each date, selects a winner from available users.
+     * 8. Updates the date with the winner, removes the winner from other waiting lists.
+     * 9. Sends notification messages to the winner and the therapist.
+     * 10. Marks the pool as having had its lots drawn.
+     *
+     * @param mixed $last_result The result of the last execution of this job (not used in this implementation)
+     * @param array $parameters Additional parameters for the job execution (not used in this implementation)
+     *
+     * @return void This method does not return a value
+     */
     public function execute($last_result, $parameters = array())
     {
         // set to default system language
@@ -54,85 +74,107 @@ class DrawLots extends CronJob
             }
         }
 
+        // Sort pools by date (earliest first)
+        usort($pools, function($a, $b) {
+            return strtotime($a->date) - strtotime($b->date);
+        });
+
         foreach ($pools as $pool) {
-            // get dates and draw lots
-            foreach ($pool->dates as $date) {
-                $list = $date->waitinglist->toArray();
+            // Sort dates by number of waitlist entries (fewest first)
+            $dates = [];
+
+            foreach ($pool->dates as $pool_date) {
+                $zw = $pool_date->toArray();
+                $zw['watinglist'] = $pool_date->waitinglist->toArray();
+                $zw['pool_date']  = $pool_date;
+                $dates[] = $zw;
+            }
+
+            usort($dates, function($a, $b) {
+                return count($a['waitinglist']) - count($b['waitinglist']);
+            });
+
+            foreach ($dates as $date_array) {
+                $list = $date_array['waitinglist'];
+                $date = $date_array['pool_date'];
 
                 if (!empty($list)) {
-                    $num = random_int(0, sizeof($list) - 1);
-                    $winner = $list[$num];
+                    // Filter out users who already have an assignment that conflicts with this date
+                    $available_users = array_filter($list, function($user) use ($date) {
+                        return !$this->hasConflictingAssignment($user['user_id'], $date);
+                    });
 
-                    echo "Date: ({$date->id}) {$date->start}, Winner is: {$winner['user_id']}, Lot number: $num\n";
+                    if (!empty($available_users)) {
+                        $num = random_int(0, count($available_users) - 1);
+                        $winner = array_values($available_users)[$num];
 
-                    $date->user_id = $winner['user_id'];
-                    $date->store();
+                        echo "Date: ({$date->id}) {$date->start}, Winner is: {$winner['user_id']}, Lot number: $num\n";
 
-                    // delete user from all other dates of the same pool
-                    $entries = new \SimpleCollection(WaitingList::findBySQL('JOIN luckyconsultation_dates AS ld
-                        ON (dates_id = ld.id)
-                        WHERE
-                            luckyconsultation_waitinglist.user_id = :user_id
-                            AND ld.pool = :pool_id',
-                        [
-                            ':user_id' => $winner['user_id'],
-                            ':pool_id' => $date->pool
-                        ]
-                    ));
+                        $date->user_id = $winner['user_id'];
+                        $date->store();
 
-                    $date_ids = $entries->pluck('dates_id');
+                        // delete user from all other dates of the same pool
+                        $entries = new \SimpleCollection(WaitingList::findBySQL('JOIN luckyconsultation_dates AS ld
+                            ON (dates_id = ld.id)
+                            WHERE
+                                luckyconsultation_waitinglist.user_id = :user_id
+                                AND ld.pool = :pool_id',
+                            [
+                                ':user_id' => $winner['user_id'],
+                                ':pool_id' => $date->pool
+                            ]
+                        ));
 
-                    WaitingList::deleteBySQL('dates_id IN ('
-                        . implode(', ', $date_ids)
-                        . ') AND user_id = :user_id',
-                        [
-                            ':user_id' => $winner['user_id']
-                        ]
-                    );
+                        $date_ids = $entries->pluck('dates_id');
 
-                    // clear waitinglist for this date
-                    $date->waitinglist = [];
-                    WaitingList::deleteByDates_id($date->id);
+                        WaitingList::deleteBySQL('dates_id IN ('
+                            . implode(', ', $date_ids)
+                            . ') AND user_id = :user_id',
+                            [
+                                ':user_id' => $winner['user_id']
+                            ]
+                        );
 
-                    // send success mail to winner
-                    $messaging = new \Messaging();
+                        // clear waitinglist for this date
+                        $date->waitinglist = [];
+                        WaitingList::deleteByDates_id($date->id);
 
-                    $template = $templates[$pool->template];
+                        // send success mail to winner
+                        $messaging = new \Messaging();
 
-                    $replacements = [
-                        '##fullname##'      => get_fullname($winner['user_id']),
-                        '##therapist##'     => $date->description,
-                        '##date##'          => date('d.m.Y', strtotime($date->start)),
-                        '##time##'          => date('H:i', strtotime($date->start)),
-                        '##weekday##'       => strftime('%A', strtotime($date->start)),
-                        '##fs_start##'      => $date->fs_start,
-                        '##fs_slot##'       => $date->fs_slot,
-                        '##fs_room##'       => $date->fs_room,
-                        '##ko_date##'       => $date->ko_date,
-                        '##ko_room##'       => $date->ko_room,
-                    ];
+                        $template = $templates[$pool->template];
 
-                    foreach ($replacements as $key => $text) {
-                        $template = str_replace($key, $text, $template);
+                        $replacements = [
+                            '##fullname##'      => get_fullname($winner['user_id']),
+                            '##therapist##'     => $date->description,
+                            '##date##'          => date('d.m.Y', strtotime($date->start)),
+                            '##time##'          => date('H:i', strtotime($date->start)),
+                            '##weekday##'       => strftime('%A', strtotime($date->start)),
+                            '##fs_start##'      => $date->fs_start,
+                            '##fs_slot##'       => $date->fs_slot,
+                            '##fs_room##'       => $date->fs_room,
+                            '##ko_date##'       => $date->ko_date,
+                            '##ko_room##'       => $date->ko_room,
+                        ];
+
+                        $messaging->insert_message($template,
+                            get_username($winner['user_id']), '____%system%____',
+                            false, false, false, false,
+                            sprintf(
+                                _('Ihnen wurde ein Termin am %s bei %s zugelost!'),
+                                $date->start, $date->description
+                            )
+                        );
+
+                        $messaging->insert_message($template,
+                            get_username($date['therapist_id']), '____%system%____',
+                            false, false, false, false,
+                            sprintf(
+                                _('%s wurde ein Termin am %s bei Ihnen zugelost!'),
+                                get_fullname($winner['user_id']), $date->start
+                            )
+                        );
                     }
-
-                    $messaging->insert_message($template,
-                        get_username($winner['user_id']), '____%system%____',
-                        false, false, false, false,
-                        sprintf(
-                            _('Ihnen wurde ein Termin am %s bei %s zugelost!'),
-                            $date->start, $date->description
-                        )
-                    );
-
-                    $messaging->insert_message($template,
-                        get_username($date['therapist_id']), '____%system%____',
-                        false, false, false, false,
-                        sprintf(
-                            _('%s wurde ein Termin am %s bei Ihnen zugelost!'),
-                            get_fullname($winner['user_id']), $date->start
-                        )
-                    );
                 }
             }
 
@@ -141,4 +183,23 @@ class DrawLots extends CronJob
         }
     }
 
+    /**
+     * Checks if a user already has an assignment that conflicts with a given date.
+     *
+     * @param int $user_id The ID of the user to check.
+     * @param object $date The date object representing the date to check for conflicts.
+     *
+     * @return bool Returns true if a conflict is found, false otherwise.
+     */
+    private function hasConflictingAssignment($user_id, $date)
+    {
+        // Check if the user already has an assignment that conflicts with this date
+        $existing_assignments = Dates::findBySQL('user_id = ? AND start BETWEEN ? AND ?', [
+            $user_id,
+            date('Y-m-d H:i:s', strtotime($date->start) - 3600), // 1 hour before
+            date('Y-m-d H:i:s', strtotime($date->start) + 3600)  // 1 hour after
+        ]);
+
+        return count($existing_assignments) > 0;
+    }
 }
