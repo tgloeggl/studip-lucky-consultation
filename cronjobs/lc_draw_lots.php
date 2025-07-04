@@ -157,6 +157,10 @@ class DrawLots extends CronJob
                             '##ko_room##'       => $date->ko_room,
                         ];
 
+                        foreach ($replacements as $key => $text) {
+                            $template = str_replace($key, $text, $template);
+                        }
+
                         $messaging->insert_message($template,
                             get_username($winner['user_id']), '____%system%____',
                             false, false, false, false,
