@@ -1,0 +1,34 @@
+# suite config
+suites:
+    api:
+        actor: ApiTester
+        path: .
+        modules:
+            enabled:
+                - REST:
+                    url: '%STUDIP_REST_URL%'
+                    depends: PhpBrowser
+                - Asserts
+                - \Helper\Api:
+                    dozent_name: '%DOZENT_NAME%'
+                    dozent_password: '%DOZENT_PASSWORD%'
+                    course_student: '%COURSE_STUDENT%'
+                    course_student_password: '%COURSE_STUDENT_PASSWORD%'
+                    course_id: '%COURSE_ID%'
+                    docker_command: '%DOCKER_COMMAND%'
+        step_decorators:
+            - \Codeception\Step\AsJson
+
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/_data
+    support: tests/_support
+
+settings:
+    shuffle: false
+    lint: true
+
+params:
+    - env
+    - tests/.env
