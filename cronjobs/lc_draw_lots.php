@@ -127,13 +127,15 @@ class DrawLots extends CronJob
 
                         $date_ids = $entries->pluck('dates_id');
 
-                        WaitingList::deleteBySQL('dates_id IN ('
-                            . implode(', ', $date_ids)
-                            . ') AND user_id = :user_id',
-                            [
-                                ':user_id' => $winner['user_id']
-                            ]
-                        );
+                        if (!empty($date_ids)) {
+                            $placeholders = implode(',', array_fill(0, count($date_ids), '?'));
+                            $params = array_merge($date_ids, [$winner['user_id']]);
+
+                            WaitingList::deleteBySQL(
+                                "dates_id IN ($placeholders) AND user_id = ?",
+                                $params
+                            );
+                        }
 
                         // clear waitinglist for this date
                         $date->waitinglist = [];
