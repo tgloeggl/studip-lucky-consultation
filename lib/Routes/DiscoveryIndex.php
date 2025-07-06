@@ -5,8 +5,8 @@ namespace LuckyConsultation\Routes;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-use LuckyConsultationController;
-use LuckyConsultationTrait;
+use LuckyConsultation\LuckyConsultationTrait;
+use LuckyConsultation\LuckyConsultationController;
 
 class DiscoveryIndex extends LuckyConsultationController
 {
@@ -14,7 +14,7 @@ class DiscoveryIndex extends LuckyConsultationController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $routes = $this->container->get('router')->getRoutes();
+        $routes = $this->container->get(\Slim\App::class)->getRouteCollector()->getRoutes();
 
         foreach ($routes as $id => $route) {
             $data[] = [
