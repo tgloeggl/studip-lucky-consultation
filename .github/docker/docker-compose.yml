@@ -15,7 +15,7 @@ services:
       TZ: Europe/Berlin
 
   studip:
-    image: studip/studip:5.5
+    image: studip/studip:5.4
     network_mode: host
     depends_on:
       - studip_db
