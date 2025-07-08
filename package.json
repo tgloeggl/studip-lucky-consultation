@@ -10,7 +10,7 @@
     "prezip": "npm run build && composer install --no-dev",
     "translate": "gettext-extract --attribute v-i18n --attribute v-translate --output locale/en/LC_MESSAGES/lucky-consultation.pot $(find vueapp -type f -name '*.vue') && /bin/bash translate.sh && gettext-compile --output vueapp/i18n/translations.json locale/en/LC_MESSAGES/lucky-consultation.po",
     "zip": "zip -r LuckyConsultation-V$npm_package_version.zip app cronjobs migrations lib vendor static README.md LuckyConsultation.php plugin.manifest",
-    "tests": "php vendor/bin/codecept run --steps"
+    "tests": "cp vendor/behat/gherkin/i18n.php vendor/i18n.php && php vendor/bin/codecept run --steps"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

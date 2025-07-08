@@ -35,6 +35,6 @@ class DrawLotsCest
     public function testDrawLots(ApiTester $I)
     {
         // Start cronjobs
-        $I->runCronjob(self::CRONJOB_DISCOVER);
+        $I->runCronjob(self::CRONJOB);
     }
 }
