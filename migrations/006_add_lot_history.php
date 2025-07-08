@@ -11,11 +11,17 @@ class AddLotHistory extends Migration
     {
         $db = DBManager::get();
 
-        $db->exec("ALTER TABLE `luckyconsultation_dates`
-            ADD `history` text NULL AFTER pool
-        ");
+        // Check if the 'history' column already exists
+        $check = $db->query("SHOW COLUMNS FROM `luckyconsultation_dates` LIKE 'history'");
+        $exists = $check->fetchColumn();
 
-        SimpleORMap::expireTableScheme();
+        if (!$exists) {
+            $db->exec("ALTER TABLE `luckyconsultation_dates`
+                ADD `history` text NULL AFTER pool
+            ");
+
+            SimpleORMap::expireTableScheme();
+        }
     }
 
     function down()
