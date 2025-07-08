@@ -2,4 +2,3 @@ node_modules
 vendor
 static
 app/views/course/index.php
-tests/.env
