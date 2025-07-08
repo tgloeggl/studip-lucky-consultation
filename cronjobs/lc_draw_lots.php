@@ -42,6 +42,23 @@ class DrawLots extends CronJob
      */
     public function execute($last_result, $parameters = array())
     {
+        $db = DBManager::get();
+
+         $clear_waitinglist_stmt = $db->prepare("DELETE luckyconsultation_waitinglist
+            FROM luckyconsultation_waitinglist
+            JOIN luckyconsultation_dates AS ld
+                ON (dates_id = ld.id)
+            WHERE
+                luckyconsultation_waitinglist.user_id = :user_id
+                AND ld.pool = :pool_id"
+         );
+
+         $waiting_list_users_stmt = $db->prepare("SELECT  luckyconsultation_waitinglist.*
+            FROM luckyconsultation_waitinglist
+            JOIN luckyconsultation_dates AS ld
+                ON (dates_id = :date_id)"
+        );
+
         // set to default system language
         setTempLanguage();
 
@@ -53,7 +70,7 @@ class DrawLots extends CronJob
             $templates[$t->id] = $t->template;
         }
 
-        // fixate all waiting list for later reference
+        // fixate all waiting lists for later reference
         foreach ($pools as $pool) {
             foreach ($pool->dates as $date) {
                 $list = $date->waitinglist->toArray();
@@ -95,8 +112,12 @@ class DrawLots extends CronJob
             });
 
             foreach ($dates as $date_array) {
-                $list = $date_array['waitinglist'];
                 $date = $date_array['pool_date'];
+
+                $waiting_list_users_stmt->execute([
+                    ':date_id' => $date->id
+                ]);
+                $list = $waiting_list_users_stmt->fetchAll();
 
                 if (!empty($list)) {
                     // Filter out users who already have an assignment that conflicts with this date
@@ -113,29 +134,10 @@ class DrawLots extends CronJob
                         $date->user_id = $winner['user_id'];
                         $date->store();
 
-                        // delete user from all other dates of the same pool
-                        $entries = new \SimpleCollection(WaitingList::findBySQL('JOIN luckyconsultation_dates AS ld
-                            ON (dates_id = ld.id)
-                            WHERE
-                                luckyconsultation_waitinglist.user_id = :user_id
-                                AND ld.pool = :pool_id',
-                            [
-                                ':user_id' => $winner['user_id'],
-                                ':pool_id' => $date->pool
-                            ]
-                        ));
-
-                        $date_ids = $entries->pluck('dates_id');
-
-                        if (!empty($date_ids)) {
-                            $placeholders = implode(',', array_fill(0, count($date_ids), '?'));
-                            $params = array_merge($date_ids, [$winner['user_id']]);
-
-                            WaitingList::deleteBySQL(
-                                "dates_id IN ($placeholders) AND user_id = ?",
-                                $params
-                            );
-                        }
+                        $clear_waitinglist_stmt->execute([
+                            ':user_id' => $winner['user_id'],
+                            ':pool_id'    => $date->pool
+                        ]);
 
                         // clear waitinglist for this date
                         $date->waitinglist = [];
