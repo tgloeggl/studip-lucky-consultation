@@ -27,7 +27,7 @@ jobs:
           node-version: 22.x
 
       - name: Build LC plugin
-        run: npm run build-dev
+        run: npm run build
 
       - name: Start containers
         working-directory: ./.github/docker
