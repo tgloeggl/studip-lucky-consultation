@@ -189,6 +189,11 @@
             />
         </div>
         </form>
+
+        <MessageBox v-if="hasUnsavedChanges" type="warning">
+            Es gibt ungespeicherte Änderungen.
+        </MessageBox>
+
     </div>
 </template>
 
@@ -199,6 +204,7 @@ import StudipButton from '@/components/Studip/StudipButton';
 import StudipIcon from '@/components/Studip/StudipIcon';
 import StudipSelect from '@/components/Studip/StudipSelect';
 import InfoField from '@/components/InfoField';
+import MessageBox from '@/components/MessageBox';
 import SprechstundenDateTable from '@/components/SprechstundenDateTable';
 
 export default {
@@ -209,6 +215,7 @@ export default {
         StudipIcon,
         StudipSelect,
         InfoField,
+        MessageBox,
         SprechstundenDateTable
     },
 
@@ -251,6 +258,41 @@ export default {
 
         preliminaryDates() {
             return this.datelist.filter(date => !this.isApproved(date));
+        },
+
+        hasUnsavedDateChanges() {
+            if (this.deleteDates.length > 0) {
+                return true;
+            }
+
+            return JSON.stringify(this.normalizeDates(this.datelist))
+                !== JSON.stringify(this.normalizeDates(this.prepareDates(this.dates)));
+        },
+
+        hasUnsavedPoolChanges() {
+            if (this.currentPool.id) {
+                const pool = this.pools && this.pools.find(pool => pool.id == this.currentPool.id);
+
+                if (!pool) {
+                    return true;
+                }
+
+                return this.currentPool.name !== pool.attributes.name
+                    || this.currentPool.date !== pool.attributes.date
+                    || this.currentPool.template !== pool.attributes.template;
+            }
+
+            if (!this.addPool) {
+                return false;
+            }
+
+            return this.currentPool.name.length > 0
+                || this.currentPool.date !== null
+                || this.currentPool.template.length > 0;
+        },
+
+        hasUnsavedChanges() {
+            return this.hasUnsavedDateChanges || this.hasUnsavedPoolChanges;
         }
     },
 
@@ -307,7 +349,8 @@ export default {
         cancelPoolEdit() {
             this.currentPool = {
                 name: '',
-                date: null
+                date: null,
+                template: ''
             }
 
             this.addPool = false;
@@ -426,6 +469,7 @@ export default {
         cancelEdit()
         {
             this.datelist = this.prepareDates(this.dates);
+            this.deleteDates = [];
             this.editMode = false;
         },
 
@@ -484,6 +528,34 @@ export default {
             }
 
             return datelist;
+        },
+
+        normalizeDates(dates) {
+            return dates.map(date => {
+                const normalized = JSON.parse(JSON.stringify(date));
+
+                delete normalized._local_id;
+
+                if (normalized.attributes) {
+                    delete normalized.attributes.id;
+                }
+
+                return normalized;
+            });
+        },
+
+        confirmDiscardUnsavedChanges() {
+            return !this.hasUnsavedChanges
+                || confirm('Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?');
+        },
+
+        handleBeforeUnload(event) {
+            if (!this.hasUnsavedChanges) {
+                return;
+            }
+
+            event.preventDefault();
+            event.returnValue = '';
         }
     },
 
@@ -494,6 +566,12 @@ export default {
             .then(() => {
                 this.datelist = this.prepareDates(this.dates);
             });
+
+        window.addEventListener('beforeunload', this.handleBeforeUnload);
+    },
+
+    beforeUnmount() {
+        window.removeEventListener('beforeunload', this.handleBeforeUnload);
     },
 
     beforeRouteEnter (to, from) {
@@ -502,6 +580,10 @@ export default {
         }
 
         return true;
+    },
+
+    beforeRouteLeave() {
+        return this.confirmDiscardUnsavedChanges();
     }
 
 };
