@@ -12,12 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Start containers
         working-directory: ./.github/docker
         run: docker compose up --wait
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Setup PHP with Composer
         uses: shivammathur/setup-php@v2
@@ -28,7 +28,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v4
         with:
-          node-version: 22.x
+          node-version: 24.x
 
       - name: Build LC plugin
         run: npm run build
