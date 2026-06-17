@@ -1,6 +1,6 @@
 services:
   studip_db:
-    image: mariadb:10.4
+    image: mariadb:latest
     volumes:
       - studip_db_data:/var/lib/mysql
     ports:
