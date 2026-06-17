@@ -227,13 +227,7 @@
                     </td>
 
                     <td class="actions">
-                        <span v-if="editMode">
-                            <studip-button icon="accept" @click="$emit('store-dates')">
-                                Alles speichern
-                            </studip-button>
-                        </span>
-
-                        <span v-else>
+                        <span v-if="!editMode">
                             <a href="#" @click.prevent="$emit('edit-all')">
                                 <studip-icon shape="edit"/> Alles bearbeiten
                             </a>

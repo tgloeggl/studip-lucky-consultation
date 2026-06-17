@@ -5,9 +5,6 @@
         <form class="default" @submit.prevent>
         <div>
             <h1>Lospools</h1>
-            <studip-button icon="add" @click="cancelPoolEdit();addPool = true">
-                Neuer Lospool
-            </studip-button>
 
             <table class="default" v-if="addPool || (pools && pools.length) ">
                 <colgroup>
@@ -136,9 +133,6 @@
 
         <div v-if="pools && pools.length">
             <h1>Freigegebene Termine und Auslastung</h1>
-            <studip-button icon="add" @click="addDate(true)">
-                Neuer freigegebener Sprechstundentermin
-            </studip-button>
 
             <span v-if="editMode">
                 <studip-button icon="accept" @click.stop="storeDates">
@@ -176,9 +170,6 @@
 
         <div v-if="pools && pools.length">
             <h1>Entwürfe und nicht freigegebene Termine</h1>
-            <studip-button icon="add" @click="addDate(false)">
-                Neuer Sprechstundentermin
-            </studip-button>
 
             <sprechstunden-date-table
                 :dates="preliminaryDates"
@@ -320,6 +311,11 @@ export default {
             }
 
             this.addPool = false;
+        },
+
+        startAddPool() {
+            this.cancelPoolEdit();
+            this.addPool = true;
         },
 
         setDateDescription(returnValue, date_id) {
