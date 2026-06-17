@@ -73,6 +73,10 @@ class DrawLots extends CronJob
         // fixate all waiting lists for later reference
         foreach ($pools as $pool) {
             foreach ($pool->dates as $date) {
+                if (!$date->approved) {
+                    continue;
+                }
+
                 $list = $date->waitinglist->toArray();
 
                 if (!empty($list)) {
@@ -101,6 +105,10 @@ class DrawLots extends CronJob
             $dates = [];
 
             foreach ($pool->dates as $pool_date) {
+                if (!$pool_date->approved) {
+                    continue;
+                }
+
                 $zw = $pool_date->toArray();
                 $zw['watinglist'] = $pool_date->waitinglist->toArray();
                 $zw['pool_date']  = $pool_date;
@@ -202,7 +210,7 @@ class DrawLots extends CronJob
     private function hasConflictingAssignment($user_id, $date)
     {
         // Check if the user already has an assignment that conflicts with this date
-        $existing_assignments = Dates::findBySQL('user_id = ? AND start BETWEEN ? AND ?', [
+        $existing_assignments = Dates::findBySQL('user_id = ? AND approved = 1 AND start BETWEEN ? AND ?', [
             $user_id,
             date('Y-m-d H:i:s', strtotime($date->start) - 3600), // 1 hour before
             date('Y-m-d H:i:s', strtotime($date->start) + 3600)  // 1 hour after

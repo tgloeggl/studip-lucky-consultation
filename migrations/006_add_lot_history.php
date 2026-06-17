@@ -19,8 +19,6 @@ class AddLotHistory extends Migration
             $db->exec("ALTER TABLE `luckyconsultation_dates`
                 ADD `history` text NULL AFTER pool
             ");
-
-            SimpleORMap::expireTableScheme();
         }
     }
 

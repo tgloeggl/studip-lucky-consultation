@@ -21,7 +21,7 @@ class MyDatesList extends LuckyConsultationController
         if ($perm->have_studip_perm('tutor', $args['course_id'])) {
             return $this->createEmptyResponse($response);
         } else {
-            $my_dates = Dates::findByUser_id($user->id);
+            $my_dates = Dates::findBySQL('user_id = ? AND approved = 1', [$user->id]);
 
             return $this->createResponse($this->toArray($my_dates), $response);
         }

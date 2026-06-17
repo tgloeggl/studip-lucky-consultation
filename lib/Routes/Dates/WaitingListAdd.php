@@ -20,7 +20,7 @@ class WaitingListAdd extends LuckyConsultationController
         global $user;
 
         // check, if date belongs to course and user can add to it
-        $date = Dates::findOneBySql('course_id = :course_id AND id = :date_id', [
+        $date = Dates::findOneBySql('course_id = :course_id AND id = :date_id AND approved = 1', [
             ':course_id' => $args['course_id'],
             ':date_id'   => $args['date_id']
         ]);
