@@ -1,6 +1,6 @@
 {
   "name": "studip-lucky-consultation",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Stud.IP plugin for lot based consultation hours",
   "author": "Till Glöggler <tgloeggl@uos.de>",
   "scripts": {
