@@ -19,7 +19,14 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th></th>
+                    <th>
+                        <input
+                            type="checkbox"
+                            :checked="allDatesSelected"
+                            :indeterminate.prop="someDatesSelected"
+                            @change="toggleAllDates"
+                        >
+                    </th>
                     <th v-if="editMode"></th>
                     <th>
                         Beschreibung
@@ -326,6 +333,25 @@ export default {
     computed: {
         dateTableColumnCount() {
             return this.editMode ? 11 : 13;
+        },
+
+        dateKeys() {
+            return this.dates.map(date => this.dateKey(date));
+        },
+
+        allDatesSelected() {
+            return this.dateKeys.length > 0
+                && this.dateKeys.every(id => this.selectedDates.includes(id));
+        },
+
+        someDatesSelected() {
+            return this.selectedDates.length > 0 && !this.allDatesSelected;
+        }
+    },
+
+    watch: {
+        dateKeys() {
+            this.selectedDates = this.selectedDates.filter(id => this.dateKeys.includes(id));
         }
     },
 
@@ -350,6 +376,10 @@ export default {
 
         setDateDescription(returnValue, dateId) {
             this.$emit('set-date-description', returnValue, dateId);
+        },
+
+        toggleAllDates(event) {
+            this.selectedDates = event.target.checked ? this.dateKeys.slice() : [];
         },
 
         moveSelectedDates() {
