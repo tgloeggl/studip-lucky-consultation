@@ -117,6 +117,16 @@
                                 v-model="currentPool.date"
                             >
                         </td>
+                        <td>
+                            <span>
+                                <select
+                                    v-model="currentPool.template"
+                                >
+                                    <option value="PP">PP</option>
+                                    <option value="KJP">KJP</option>
+                                </select>
+                            </span>
+                        </td>
                         <td class="actions">
                             <studip-button icon="accept" @click="storePool">
                                 Speichern
