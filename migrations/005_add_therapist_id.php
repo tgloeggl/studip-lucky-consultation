@@ -14,8 +14,6 @@ class AddTherapistId extends Migration
         $db->exec("ALTER TABLE `luckyconsultation_dates`
             ADD `therapist_id` varchar(32) NULL COLLATE latin1_bin
         ");
-
-        SimpleORMap::expireTableScheme();
     }
 
     function down()

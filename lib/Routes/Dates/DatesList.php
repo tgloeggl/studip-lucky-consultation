@@ -22,7 +22,7 @@ class DatesList extends LuckyConsultationController
             $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);
         } else {
             // check, if user has already a date in one or many of the pools
-            $my_dates = new \SimpleCollection(Dates::findByUser_id($user->id));
+            $my_dates = new \SimpleCollection(Dates::findBySQL('user_id = ? AND approved = 1', [$user->id]));
             $pool_ids = $my_dates->pluck('pool');
 
             if (!empty($pool_ids)) {
@@ -31,6 +31,7 @@ class DatesList extends LuckyConsultationController
                     WHERE luckyconsultation_dates.course_id = :course_id
                         AND (lp.date > NOW() OR lots_drawn = 0)
                         AND luckyconsultation_dates.start > NOW()
+                        AND luckyconsultation_dates.approved = 1
                         AND pool NOT IN (' . implode(', ', $pool_ids) . ')
                         AND user_id IS NULL',
                     [
@@ -43,6 +44,7 @@ class DatesList extends LuckyConsultationController
                     WHERE luckyconsultation_dates.course_id = :course_id
                         AND (lp.date > NOW() OR lots_drawn = 0)
                         AND luckyconsultation_dates.start > NOW()
+                        AND luckyconsultation_dates.approved = 1
                         AND user_id IS NULL',
                     [
                     'course_id' => $args['course_id']

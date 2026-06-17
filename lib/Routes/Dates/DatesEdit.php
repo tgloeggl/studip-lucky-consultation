@@ -21,7 +21,7 @@ class DatesEdit extends LuckyConsultationController
         $json = $this->getRequestData($request);
 
         foreach ($json['dates'] as $json_date) {
-            $date = Dates::find($json_date['id']);
+            $date = !empty($json_date['id']) ? Dates::find($json_date['id']) : null;
 
             if (empty($date)) {
                 $date = new Dates();
@@ -43,7 +43,7 @@ class DatesEdit extends LuckyConsultationController
         foreach ($json['delete'] as $date_id) {
             $date = Dates::find($date_id);
 
-            if ($date->course_id == $args['course_id']) {
+            if (!empty($date) && $date->course_id == $args['course_id']) {
                 $date->delete();
             }
         }

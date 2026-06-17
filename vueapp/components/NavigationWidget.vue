@@ -44,11 +44,6 @@ export default {
     components: {
         StudipIcon
     },
-    data() {
-        return {
-            showAddDialog: false
-        }
-    },
 
     computed: {
         ...mapGetters(['cid', 'currentUser']),

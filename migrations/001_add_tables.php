@@ -28,6 +28,7 @@ class AddTables extends Migration
             `description` varchar(255) NOT NULL,
             `start` datetime NOT NULL,
             `pool` int NULL,
+            `approved` tinyint NOT NULL DEFAULT '0',
             `mkdate` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
             `chdate` datetime NOT NULL,
             FOREIGN KEY (`pool`) REFERENCES `luckyconsultation_pools` (`id`)  ON DELETE SET NULL ON UPDATE CASCADE
@@ -41,8 +42,6 @@ class AddTables extends Migration
             PRIMARY KEY (`dates_id`, `user_id`),
             FOREIGN KEY (`dates_id`) REFERENCES `luckyconsultation_dates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
         )");
-
-        SimpleORMap::expireTableScheme();
     }
 
     function down()

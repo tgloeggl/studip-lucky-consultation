@@ -77,8 +77,6 @@ Mit freundlichen Grüßen';
             ':kjp' => self::KJP,
             ':pp'  => self::PP
         ]);
-
-        SimpleORMap::expireTableScheme();
     }
 
     function down()

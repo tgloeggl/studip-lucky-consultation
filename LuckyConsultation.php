@@ -215,6 +215,10 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
      */
     public function isActivatableForContext(Range $context)
     {
+        if ($GLOBALS['perm']->have_perm('root')) {
+            return true;
+        }
+        
         if ($context->getRangeType() === 'course' &&
             $context->getSemClass()['studygroup_mode']) {
             return false;
