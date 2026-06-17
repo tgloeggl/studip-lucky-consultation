@@ -9,6 +9,7 @@ use LuckyConsultation\Errors\Error;
 use LuckyConsultation\LuckyConsultationTrait;
 use LuckyConsultation\LuckyConsultationController;
 use LuckyConsultation\Models\Dates;
+use LuckyConsultation\Models\WaitingList;
 
 class DatesEdit extends LuckyConsultationController
 {
@@ -32,8 +33,15 @@ class DatesEdit extends LuckyConsultationController
                 unset($json_date['attributes']['id']);
                 unset($json_date['attributes']['course_id']);
 
+                $clear_waitinglist = !empty($date->id)
+                    && $this->startChanged($date->start, $json_date['attributes']['start']);
+
                 $date->setData($json_date['attributes']);
                 $date->store();
+
+                if ($clear_waitinglist) {
+                    WaitingList::deleteByDates_id($date->id);
+                }
             } else {
                 throw new Error('Access Denied', 403);
             }
@@ -51,5 +59,14 @@ class DatesEdit extends LuckyConsultationController
         $dates = Dates::findBySQL('course_id = ? ORDER BY start DESC', [$args['course_id']]);
 
         return $this->createResponse($this->toArray($dates), $response);
+    }
+
+    private function startChanged($old_start, $new_start)
+    {
+        if (empty($old_start) || empty($new_start)) {
+            return $old_start != $new_start;
+        }
+
+        return strtotime($old_start) !== strtotime($new_start);
     }
 }

@@ -114,7 +114,8 @@
                                     invalid: dateValidation.start == date.id
                                 }"
                                 type="datetime-local"
-                                v-model="date.attributes.start"
+                                :value="date.attributes.start"
+                                @change="changeStart(date, $event)"
                             >
                         </span>
 
@@ -380,6 +381,36 @@ export default {
 
         toggleAllDates(event) {
             this.selectedDates = event.target.checked ? this.dateKeys.slice() : [];
+        },
+
+        changeStart(date, event) {
+            const oldStart = date.attributes.start;
+            const newStart = event.target.value;
+
+            if (newStart === oldStart) {
+                return;
+            }
+
+            if (this.hasWaitingList(date)) {
+                const confirmed = confirm(
+                    'Wenn Datum oder Uhrzeit geändert werden, wird die Losliste für diesen Termin gelöscht. Fortfahren?'
+                );
+
+                if (!confirmed) {
+                    event.target.value = oldStart || '';
+                    return;
+                }
+
+                date.attributes.waiting = 0;
+                date.attributes.waitinglist = [];
+            }
+
+            date.attributes.start = newStart;
+        },
+
+        hasWaitingList(date) {
+            return date.attributes.waiting > 0
+                || (date.attributes.waitinglist && date.attributes.waitinglist.length > 0);
         },
 
         moveSelectedDates() {
