@@ -4,8 +4,8 @@
   "description": "Stud.IP plugin for lot based consultation hours",
   "author": "Till Glöggler <tgloeggl@uos.de>",
   "scripts": {
-    "build": "webpack --mode production",
-    "dev": "webpack --mode development --watch",
+    "build": "rspack --mode production",
+    "dev": "rspack --mode development --watch",
     "prebuild": "npm install",
     "prezip": "npm run build && composer install --no-dev",
     "translate": "gettext-extract --attribute v-i18n --attribute v-translate --output locale/en/LC_MESSAGES/lucky-consultation.pot $(find vueapp -type f -name '*.vue') && /bin/bash translate.sh && gettext-compile --output vueapp/i18n/translations.json locale/en/LC_MESSAGES/lucky-consultation.po",
@@ -13,25 +13,17 @@
     "tests": "cp vendor/behat/gherkin/i18n.php vendor/i18n.php && php vendor/bin/codecept run --steps"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.26.0",
     "@popperjs/core": "^2.11.8",
-    "@vue/cli-service": "^5.0.8",
     "@vue/compiler-sfc": "^3.5.13",
+    "@rspack/cli": "^2.0.8",
+    "@rspack/core": "^2.0.8",
     "axios": "^1.7.7",
-    "babel-loader": "^9.2.1",
-    "clean-terminal-webpack-plugin": "^3.0.0",
-    "clean-webpack-plugin": "^4.0.0",
     "core-js": "^3.39.0",
     "css-loader": "^7.1.2",
     "date-fns": "^4.1.0",
     "easygettext": "^2.17.0",
-    "extract-loader": "^5.1.0",
-    "file-loader": "^6.2.0",
     "focus-trap-vue": "^4.0.3",
-    "html-webpack-plugin": "^5.6.3",
     "install": "^0.13.0",
-    "mini-css-extract-plugin": "^2.9.2",
     "postcss": "^8.4.49",
     "postcss-loader": "^8.1.1",
     "redoc-cli": "^0.13.21",
@@ -45,9 +37,7 @@
     "vue-router": "^4.4.5",
     "vue3-gettext": "^2.4.0",
     "vue3-select": "^0.1.2",
-    "vuex": "^4.1.0",
-    "webpack": "^5.96.1",
-    "webpack-cli": "^5.1.4"
+    "vuex": "^4.1.0"
   },
   "browserslist": "> 0.25%, not dead, not IE 11"
 }
