@@ -33,6 +33,21 @@ jobs:
         working-directory: ./.github/docker
         run: docker compose up --wait
 
+      - name: Wait for database
+        working-directory: ./.github/docker
+        run: |
+          for i in {1..60}; do
+            if docker compose exec -T studip_db mysqladmin ping -h 127.0.0.1 -u studip_user --password=studip_password --silent; then
+              exit 0
+            fi
+
+            docker compose ps studip_db
+            sleep 2
+          done
+
+          docker compose logs studip_db
+          exit 1
+
       # Needed as studip directory has root owner and chown on whole directory takes too long
       - name: Allow read, write and execute for all users in data and plugin directory
         working-directory: ./.github/docker
