@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Start containers
+        working-directory: ./.github/docker
+        run: docker compose up --wait
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -28,10 +32,6 @@ jobs:
 
       - name: Build LC plugin
         run: npm run build
-
-      - name: Start containers
-        working-directory: ./.github/docker
-        run: docker compose up --wait
 
       - name: Wait for database
         working-directory: ./.github/docker

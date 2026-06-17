@@ -13,13 +13,7 @@ services:
       MYSQL_USER: studip_user
       MYSQL_PASSWORD: studip_password
       TZ: Europe/Berlin
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "studip_user", "--password=studip_password", "--silent"]
-      interval: 5s
-      timeout: 5s
-      retries: 24
-      start_period: 30s
-
+  
   studip:
     image: studip/studip:5.4
     network_mode: host
