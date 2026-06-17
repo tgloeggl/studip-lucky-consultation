@@ -36,33 +36,6 @@ export default {
         'create-approved-date',
         'create-pool',
         'create-preliminary-date'
-    ],
-
-    computed: {
-        ...mapGetters(['cid', 'currentUser']),
-
-        fragment() {
-            return this.$route.name;
-        },
-
-        hasPerms()
-        {
-            if (!this.currentUser) {
-                return false;
-            }
-
-            return (this.currentUser.status == 'root' || this.currentUser.admin == true);
-        },
-
-        showActions()
-        {
-            return this.hasPerms && this.fragment == 'editor';
-        }
-    },
-
-    beforeMount()
-    {
-        this.$store.dispatch('loadCurrentUser');
-    }
+    ]
 }
 </script>

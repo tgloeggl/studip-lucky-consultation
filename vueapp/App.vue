@@ -53,10 +53,12 @@ export default {
             if (activeView && typeof activeView[method] === 'function') {
                 activeView[method](...args);
             }
-        }
+        },
     },
 
     beforeMount() {
+        this.$store.dispatch('loadCurrentUser');
+    
         const placeholder = document.getElementById('sidebar-navigation');
         placeholder.innerHTML = '';
 

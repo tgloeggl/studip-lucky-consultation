@@ -40,6 +40,10 @@ class CourseController extends StudipController
      */
     private function setSidebar()
     {
+        if (!$GLOBALS['perm']->have_studip_perm('tutor', \Context::getId())) {
+            return;
+        }
+
         $sidebar = Sidebar::get();
 
         $actions = new \TemplateWidget(
