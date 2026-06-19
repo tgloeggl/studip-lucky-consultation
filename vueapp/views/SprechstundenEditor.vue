@@ -461,12 +461,14 @@ export default {
                     }
                 }
 
-                new_date = JSON.parse(use_date);
+                if (use_date) {
+                    new_date = JSON.parse(use_date);
 
-                delete new_date.id
-                delete new_date.attributes.id;
-                delete new_date.attributes.start
-                new_date.attributes.approved = approved ? 1 : 0;
+                    delete new_date.id
+                    delete new_date.attributes.id;
+                    delete new_date.attributes.start
+                    new_date.attributes.approved = approved ? 1 : 0;
+                }
             } else {
                 this.datelist = [];
             }
