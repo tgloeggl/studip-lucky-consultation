@@ -142,6 +142,10 @@
         </div>
 
         <div v-if="pools && pools.length">
+            <MessageBox v-if="datesSaved" type="success" @hide="datesSaved = false">
+                Termine wurden gespeichert.
+            </MessageBox>
+
             <h1>Freigegebene Termine und Auslastung</h1>
 
             <span v-if="editMode">
@@ -257,7 +261,8 @@ export default {
             editMode: false,
             datelist: [],
             deleteDates: [],
-            nextLocalDateId: 1
+            nextLocalDateId: 1,
+            datesSaved: false
         }
     },
 
@@ -305,6 +310,14 @@ export default {
 
         hasUnsavedChanges() {
             return this.hasUnsavedDateChanges || this.hasUnsavedPoolChanges;
+        }
+    },
+
+    watch: {
+        hasUnsavedChanges(hasUnsavedChanges) {
+            if (hasUnsavedChanges) {
+                this.datesSaved = false;
+            }
         }
     },
 
@@ -416,6 +429,7 @@ export default {
                 this.datelist = this.prepareDates(this.dates);
                 this.deleteDates = [];
                 this.editMode = false;
+                this.datesSaved = true;
             });
         },
 
