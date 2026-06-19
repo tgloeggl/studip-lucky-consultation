@@ -257,6 +257,14 @@
                         >
                             {{ moveLabel }}
                         </studip-button>
+
+                        <studip-button
+                            icon="trash"
+                            :disabled="selectedDates.length === 0"
+                            @click="deleteSelectedDates"
+                        >
+                            Ausgewählte löschen
+                        </studip-button>
                     </td>
                 </tr>
             </tfoot>
@@ -317,6 +325,7 @@ export default {
 
     emits: [
         'delete-date',
+        'delete-selected',
         'delete-user-from-date',
         'edit-all',
         'move-selected',
@@ -415,6 +424,15 @@ export default {
 
         moveSelectedDates() {
             this.$emit('move-selected', this.selectedDates);
+            this.selectedDates = [];
+        },
+
+        deleteSelectedDates() {
+            if (!confirm(this.selectedDates.length + ' ausgewählte Termine löschen?')) {
+                return;
+            }
+
+            this.$emit('delete-selected', this.selectedDates);
             this.selectedDates = [];
         }
     }

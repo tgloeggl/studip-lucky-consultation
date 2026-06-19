@@ -169,6 +169,7 @@
                 move-label="Auswahl in Entwurfsmodus verschieben"
                 empty-message="Es sind noch keine freigegebenen Termine vorhanden."
                 @delete-date="deleteDate"
+                @delete-selected="deleteSelectedDates"
                 @delete-user-from-date="deleteUserFromDate"
                 @edit-all="editMode = true"
                 @move-selected="moveSelectedDates($event, true)"
@@ -190,6 +191,7 @@
                 move-label="Auswahl freigeben"
                 empty-message="Es sind keine Entwürfe vorhanden."
                 @delete-date="deleteDate"
+                @delete-selected="deleteSelectedDates"
                 @delete-user-from-date="deleteUserFromDate"
                 @edit-all="editMode = true"
                 @move-selected="moveSelectedDates($event, false)"
@@ -504,6 +506,18 @@ export default {
             }
 
             this.datelist.splice(found, 1);
+        },
+
+        deleteSelectedDates(date_ids) {
+            if (!date_ids.length) {
+                return;
+            }
+
+            for (let date_id of date_ids) {
+                this.removeDateFromList(date_id);
+            }
+
+            this.editMode = true;
         },
 
         isApproved(date) {
