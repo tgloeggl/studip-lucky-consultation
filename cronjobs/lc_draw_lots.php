@@ -209,6 +209,7 @@ class DrawLots extends CronJob
      */
     private function hasConflictingAssignment($user_id, $date)
     {
+        // TODO: Check if the user has a date for this timeslots +/- 1 hour 16 weeks in the past until 16 weeks into the future
         // Check if the user already has an assignment that conflicts with this date
         $existing_assignments = Dates::findBySQL('user_id = ? AND approved = 1 AND start BETWEEN ? AND ?', [
             $user_id,
