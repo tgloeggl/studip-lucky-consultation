@@ -9,7 +9,7 @@ use LuckyConsultation\Models\Dates;
 use LuckyConsultation\Models\Pools;
 use LuckyConsultation\Models\WaitingList;
 
-class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyPlugin, SystemPlugin
+class LuckyConsultation extends StudIPPlugin implements StandardPlugin, PrivacyPlugin, SystemPlugin
 {
     const GETTEXT_DOMAIN = 'lucky-consultation';
 
