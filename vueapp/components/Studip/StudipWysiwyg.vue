@@ -1,6 +1,7 @@
 <template>
     <textarea
         :value="value"
+        @input="updateValue($event.target.value)"
         ref="studip_wysiwyg"
         class="studip-wysiwyg"
     />
@@ -29,7 +30,7 @@ export default {
 
     methods: {
         initCKE() {
-            if (!STUDIP.wysiwyg_enabled) {
+             if (typeof STUDIP?.wysiwyg?.replace !== 'function') {
                 return false;
             }
 
@@ -59,9 +60,11 @@ export default {
 
             this.wysiwyg_editor = STUDIP.wysiwyg.getEditor(textarea);
 
+            console.log("getting data from editor");
             // using toRaw to remove Vue proxys. They do not work well with CKEditor
-            toRaw(this.wysiwyg_editor).ui.focusTracker.on( 'change:isFocused', () => {
-                view.updateValue(toRaw(view.wysiwyg_editor).getData());
+            const editor = toRaw(this.wysiwyg_editor);
+            editor.ui.focusTracker.on('change:isFocused', () => {
+                view.updateValue(editor.getData());
             });
         },
 

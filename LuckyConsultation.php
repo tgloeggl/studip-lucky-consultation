@@ -316,19 +316,27 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
 
         if (substr($unconsumed_path, 0, 3) == 'api') {
             // make sure, slim knows if we are running https, see https://github.com/elan-ev/studip-opencast-plugin/issues/816
-            if (strpos($GLOBALS['ABSOLUTE_URI_STUDIP'], 'https') === 0) {
+            if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
                 $_SERVER['HTTPS'] = 'on';
+                $_SERVER['SERVER_PORT'] = 443;
             }
 
             $appFactory = new AppFactory();
             $app = $appFactory->makeApp($this);
-            $app->setBasePath(rtrim(PluginEngine::getLink($this, [], null, true), '/'));
+
+            $basePath = parse_url(PluginEngine::getLink($this, [], null, true), PHP_URL_PATH) ?? '';
+            $app->setBasePath(rtrim($basePath, '/'));
             $app->group('/api', RouteMap::class);
 
             $app->run();
         } else {
+            if (!empty($GLOBALS['ABSOLUTE_URI_STUDIP'])) {
+                URLHelper::setBaseURL($GLOBALS['ABSOLUTE_URI_STUDIP']);
+            }
+
             $trails_root = $this->getPluginPath() . '/app';
-            $dispatcher  = new Trails_Dispatcher($trails_root,
+            $dispatcher  = new Trails_Dispatcher(
+                $trails_root,
                 rtrim(PluginEngine::getURL($this, null, ''), '/'),
                 'index'
             );
@@ -336,6 +344,8 @@ class LuckyConsultation extends StudipPlugin implements StandardPlugin, PrivacyP
             $dispatcher->current_plugin = $this;
             $dispatcher->dispatch($unconsumed_path);
         }
+
+        die;
     }
 
     public function getAssetsUrl()

@@ -8,7 +8,7 @@
         </Teleport>
 
         <Teleport v-if="hasActionWidget" to="#action-widget">
-            <ActionsWidget
+            <ActionsWidget v-if="fragment == 'editor'"
                 @create-pool="callActiveView('startAddPool')"
                 @create-approved-date="callActiveView('addDate', true)"
                 @create-preliminary-date="callActiveView('addDate', false)"
@@ -44,6 +44,12 @@ export default {
         return {
             hasActionWidget: false
         }
+    },
+
+    computed: {
+        fragment() {
+            return this.$route.name;
+        },
     },
 
     methods: {
