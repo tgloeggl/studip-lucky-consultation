@@ -152,14 +152,14 @@ const actions = {
             });
     },
 
-    async loadInfotext({ dispatch, commit }) {
+    async loadInfotext({ commit, state }) {
         return ApiService.get('course/' + state.cid + '/infotext')
             .then(({ data }) => {
                 commit('setInfotext', data.infotext);
             });
     },
 
-    async updateInfotext({ dispatch, commit }, infotext) {
+    async updateInfotext({ commit, state }, infotext) {
         commit('setInfotext', infotext);
 
         return ApiService.put('course/' + state.cid + '/infotext', {

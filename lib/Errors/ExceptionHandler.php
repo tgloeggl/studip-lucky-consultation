@@ -2,11 +2,10 @@
 
 namespace LuckyConsultation\Errors;
 
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Slim\Container;
-use Slim\Psr7\Response;
+use \GuzzleHttp\Psr7\Response;
 
 /**
  * Dieser spezielle Exception Handler wird in der Slim-Applikation
@@ -26,7 +25,7 @@ class ExceptionHandler
         bool $logErrors,
         bool $logErrorDetails,
         ?LoggerInterface $logger = null
-    ): Response {
+    ): ResponseInterface {
         if ($exception instanceof Error) {
             $httpCode = $exception->getCode();
             $errors = new ErrorCollection();
@@ -36,7 +35,20 @@ class ExceptionHandler
             }
 
             $errors->add($exception);
+        } elseif ($exception instanceof \Slim\Exception\HttpException) {
+            $httpCode = (int) $exception->getCode();
+            if ($httpCode === 0 && method_exists($exception, 'getStatusCode')) {
+                $httpCode = (int) $exception->getStatusCode();
+            }
+
+            $details = $displayErrorDetails ? (string) $exception : null;
+
+            $errors = new ErrorCollection();
+            $errors->add(new Error($exception->getMessage(), $httpCode, $details));
         } else {
+            // Log always php exceptions
+            error_log($exception);
+
             $httpCode = 500;
             $details = null;
 

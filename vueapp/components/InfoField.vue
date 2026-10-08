@@ -3,7 +3,7 @@
         <span  v-if="edit" class="infotext">
             <studip-wysiwyg
                 name="info" class="wysiwyg"
-                :value="infotext"
+                :value="local_infotext"
                 @input="updateInfotext"
             ></studip-wysiwyg>
         </span>
@@ -11,7 +11,7 @@
         <span v-if="!edit && infotext" class="infotext" v-html="infotext">
         </span>
 
-        <studip-button v-if="!edit" icon="edit" @click.prevent="edit = true">
+        <studip-button v-if="!edit" icon="edit" @click.prevent="startEditing">
             Infotext bearbeiten
         </studip-button>
 
@@ -19,7 +19,7 @@
             Speichern
         </studip-button>
 
-        <studip-button v-if="edit" icon="edit" @click.prevent="edit = false">
+        <studip-button v-if="edit" icon="edit" @click.prevent="cancelEditing">
             Abbrechen
         </studip-button>
     </div>
@@ -50,6 +50,16 @@ export default {
     },
 
     methods: {
+        startEditing() {
+            this.local_infotext = this.infotext || '';
+            this.edit = true;
+        },
+
+        cancelEditing() {
+            this.edit = false;
+            this.local_infotext = '';
+        },
+
         updateInfotext(new_text) {
             this.local_infotext = new_text;
         },

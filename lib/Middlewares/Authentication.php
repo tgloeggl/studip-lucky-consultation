@@ -4,7 +4,7 @@ namespace LuckyConsultation\Middlewares;
 
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\Psr7\Response;
+use \GuzzleHttp\Psr7\Response;
 
 class Authentication
 {
